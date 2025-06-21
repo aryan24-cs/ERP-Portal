@@ -12,8 +12,9 @@ const app = express();
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 // MongoDB Atlas Connection
 mongoose
@@ -70,6 +71,9 @@ const authMiddleware = (role) => (req, res, next) => {
 };
 
 // Routes
+app.get("/", (req, res) => res.render("index"));
+app.get("/login", (req, res) => res.render("login"));
+
 app.get("/login", (req, res) => res.render("login", { error: null }));
 app.post("/login", async (req, res) => {
   const { email } = req.body;

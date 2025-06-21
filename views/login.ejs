@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERP Portal - Login</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Login</h2>
+      <% if (error) { %>
+      <p class="error"><%= error %></p>
+      <% } %> <% if (otpSent) { %>
+      <form action="/verify-otp" method="POST">
+        <input type="hidden" name="email" value="<%= email %>" />
+        <input type="text" name="otp" placeholder="Enter OTP" required />
+        <button type="submit">Verify OTP</button>
+      </form>
+      <% } else { %>
+      <form action="/login" method="POST">
+        <input type="email" name="email" placeholder="Email" required />
+        <button type="submit">Send OTP</button>
+      </form>
+      <% } %>
+      <p><a href="/register">Register</a> | <a href="/">Home</a></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Portal - User Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome, <%= user.name %></h1>
+      <a href="/" class="button">Logout</a>
+    </div>
+    <div class="dashboard">
+      <div class="card">
+        <h2>Details</h2>
+        <p>Roll No: <%= user.details.rollNo %></p>
+        <p>Class: <%= user.details.class %></p>
+      </div>
+      <div class="card">
+        <h2>Attendance</h2>
+        <ul>
+          <% user.attendance.forEach(record => { %>
+            <li><%= record.date %>: <%= record.status %></li>
+          <% }) %>
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Documents</h2>
+        <ul>
+          <% documents.forEach(doc => { %>
+            <li><a href="/<%= doc.filePath %>" download>Download <%= doc.fileType %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
