@@ -73,6 +73,10 @@ const authMiddleware = (role) => (req, res, next) => {
 // Routes
 app.get("/", (req, res) => res.render("index"));
 app.get("/login", (req, res) => res.render("login"));
+app.get("/register", (req, res) => res.render("register"));
+app.get("/user", (req, res) => res.render("user"));
+app.get("/admin", (req, res) => res.render("admin"));
+
 
 app.get("/login", (req, res) => res.render("login", { error: null }));
 app.post("/login", async (req, res) => {
