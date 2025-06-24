@@ -1,60 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ERP Portal</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: "Poppins", sans-serif;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Portal - Welcome</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-blue: #3b82f6;
+      --primary-purple: #8b57f6;
+      --primary-teal: #06b6d4;
+      --primary-pink: #ec4899;
+      --primary-indigo: #6366f1;
+      --accent-orange: #f97316;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
+      min-height: 100vh;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .blob-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      padding: 2rem;
+    }
+
+    .blob-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
+    }
+
+    .text-flow {
+      color: white;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .flowing-button {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple), var(--primary-teal));
+      background-size: 200% 200%;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      animation: gradientFlow 3s ease infinite;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .flowing-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    @keyframes slideInLeft {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateX(50px);
+    }
+
+    @keyframes slideInRight {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .zoom-in {
+      animation: zoomIn 1s ease-out forwards;
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    @keyframes zoomIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .hero-section {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--primary-teal);
+      margin-bottom: 1rem;
+    }
+
+    .footer-link:hover {
+      color: var(--primary-purple);
+    }
+
+    @media (max-width: 640px) {
+      .hero-section {
+        min-height: 60vh;
       }
-      .fade-in {
-        animation: fadeIn 0.5s ease-in;
+      .blob-card {
+        padding: 1.5rem;
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
+      .flowing-button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
       }
-    </style>
-  </head>
-  <body class="bg-gray-100">
-    <header
-      class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg"
-    >
-      <div
-        class="container mx-auto px-4 py-4 flex justify-between items-center"
-      >
-        <h1 class="text-2xl font-bold">ERP Portal</h1>
-        <nav>
-          <a
-            href="/login"
-            class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-            >Login</a
-          >
-        </nav>
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="py-4 px-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-flow slide-in-left">ERP Portal</h1>
+    <nav class="slide-in-right">
+      <a href="/login" class="flowing-button" aria-label="Go to login page">
+        <i class="fas fa-sign-in-alt"></i> Login
+      </a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container mx-auto px-4 text-center zoom-in">
+      <h2 class="text-4xl md:text-5xl font-bold text-flow mb-4">
+        Welcome to the Future of Academic Management
+      </h2>
+      <p class="text-lg md:text-xl text-flow mb-6 max-w-2xl mx-auto">
+        Streamline your academic journey with our intuitive ERP Portal. Manage records, track attendance, and stay connected seamlessly.
+      </p>
+      <a href="/login" class="flowing-button" aria-label="Get started with ERP Portal">
+        <i class="fas fa-rocket"></i> Get Started
+      </a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-12 px-4">
+    <div class="container mx-auto">
+      <h3 class="text-3xl font-semibold text-flow text-center mb-8 slide-in-left">
+        Why Choose Our ERP Portal?
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="blob-card slide-in-left">
+          <i class="fas fa-users feature-icon"></i>
+          <h4 class="text-xl font-semibold text-flow mb-2">Student Management</h4>
+          <p class="text-flow">
+            Easily manage student profiles, courses, and academic records in one place.
+          </p>
+        </div>
+        <div class="blob-card slide-in-right">
+          <i class="fas fa-calendar-check feature-icon"></i>
+          <h4 class="text-xl font-semibold text-flow mb-2">Attendance Tracking</h4>
+          <p class="text-flow">
+            Monitor attendance with real-time updates and detailed reports.
+          </p>
+        </div>
+        <div class="blob-card slide-in-left">
+          <i class="fas fa-file-upload feature-icon"></i>
+          <h4 class="text-xl font-semibold text-flow mb-2">Document Upload</h4>
+          <p class="text-flow">
+            Securely upload and access academic documents anytime, anywhere.
+          </p>
+        </div>
       </div>
-    </header>
-    <main class="container mx-auto px-4 py-8 fade-in">
-      <div class="text-center">
-        <h2 class="text-3xl font-semibold mb-4">Welcome to Our ERP Portal</h2>
-        <p class="text-lg text-gray-600">
-          Manage your academic records seamlessly with our intuitive platform.
-        </p>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-12 px-4 bg-gradient-to-r from-[#3d5f75] to-[#164172]">
+    <div class="container mx-auto text-center zoom-in">
+      <h3 class="text-3xl font-semibold text-flow mb-4">
+        Ready to Transform Your Academic Experience?
+      </h3>
+      <p class="text-lg text-flow mb-6 max-w-xl mx-auto">
+        Join thousands of students and administrators using our ERP Portal to simplify academic management.
+      </p>
+      <a href="/login" class="flowing-button" aria-label="Join now">
+        <i class="fas fa-sign-in-alt"></i> Join Now
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-6 px-4 bg-[#164172]">
+    <div class="container mx-auto text-center">
+      <p class="text-flow mb-4">
+        &copy; <%= new Date().getFullYear() %> ERP Portal. All rights reserved.
+      </p>
+      <div class="flex justify-center space-x-4 mb-4">
+        <a href="/login" class="text-flow footer-link hover:text-purple-400">Login</a>
+        <a href="#" class="text-flow footer-link hover:text-purple-400">Privacy Policy</a>
+        <a href="#" class="text-flow footer-link hover:text-purple-400">Terms of Service</a>
       </div>
-    </main>
-  </body>
+      <div class="flex justify-center space-x-4">
+        <a href="#" class="text-flow hover:text-purple-400" aria-label="Facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="#" class="text-flow hover:text-purple-400" aria-label="Twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="#" class="text-flow hover:text-purple-400" aria-label="LinkedIn">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Add intersection observer for animations
+      const elements = document.querySelectorAll(
+        ".slide-in-left, .slide-in-right, .zoom-in"
+      );
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.style.animationPlayState = "running";
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+      elements.forEach((el) => observer.observe(el));
+    });
+  </script>
+</body>
 </html>
