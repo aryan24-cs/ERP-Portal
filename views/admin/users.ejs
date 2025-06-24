@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ERP Portal - Admin Dashboard</title>
+    <title>ERP Portal - All Users</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -28,13 +28,14 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        );
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -129,7 +130,7 @@
         box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
       }
 
-      .admin-blob {
+      .users-blob {
         border-radius: 60px 25px 60px 25px;
         transform: rotate(-2deg);
         margin: 2rem 1rem;
@@ -190,34 +191,6 @@
         background: rgba(255, 255, 255, 0.05);
       }
 
-      .icon-bubble {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-      }
-
       .error-flow {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
@@ -241,81 +214,33 @@
         justify-content: space-between;
         box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
       }
-
-      .flowing-button {
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple),
-          var(--primary-teal)
-        );
-        background-size: 200% 200%;
-        border: none;
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        animation: gradientFlow 3s ease infinite;
-      }
-
-      @keyframes gradientFlow {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      .flowing-button:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-      }
     </style>
   </head>
   <body>
     <button class="sidebar-toggle" aria-label="Toggle Sidebar">
       <i class="fas fa-bars"></i>
     </button>
-    <%- include('./partials/admin-sidebar', { token, currentPage: 'admin' }) %>
+    <%- include('../partials/admin-sidebar', { token, currentPage: 'users' }) %>
 
     <div class="morphing-container">
       <header class="organic-header fade-in-flow">
         <div class="px-8 py-6">
           <div class="flex items-center">
             <div class="icon-bubble mr-6">
-              <i class="fas fa-cogs"></i>
+              <i class="fas fa-users"></i>
             </div>
             <div>
-              <h1 class="text-3xl font-bold text-flow">Admin Dashboard</h1>
-              <p class="text-flow opacity-90 text-lg">Manage your college</p>
+              <h1 class="text-3xl font-bold text-flow">All Users</h1>
+              <p class="text-flow opacity-90 text-lg">
+                View all students in the system
+              </p>
             </div>
           </div>
         </div>
       </header>
 
       <main class="flowing-grid">
-        <% if (typeof success !== 'undefined' && success) { %>
-        <div class="success-flow fade-in-flow" id="success-message">
-          <div class="flex items-center">
-            <i class="fas fa-check-circle text-2xl mr-4"></i>
-            <span class="font-semibold text-lg"><%= success %></span>
-          </div>
-          <button
-            class="text-white hover:text-gray-200"
-            onclick="dismissMessage('success-message')"
-            aria-label="Close success message"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <% } %> <% if (typeof error !== 'undefined' && error) { %>
+        <% if (typeof error !== 'undefined' && error) { %>
         <div class="error-flow fade-in-flow" id="error-message">
           <div class="flex items-center">
             <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
@@ -330,33 +255,10 @@
           </button>
         </div>
         <% } %>
-
-        <section class="admin-profile-section">
-          <div class="blob-card admin-blob slide-in-left">
-            <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">Admin Profile</h3>
-              <div class="table-container">
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>Name</td>
-                      <td>Sunil Baghel</td>
-                    </tr>
-                    <tr>
-                      <td>Email</td>
-                      <td>sunilbaghel93100@gmail.com</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section class="users-section">
-          <div class="blob-card admin-blob slide-in-left">
+          <div class="blob-card users-blob slide-in-left">
             <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">Users Created</h3>
+              <h3 class="text-2xl font-bold text-flow mb-4">All Users</h3>
               <div class="table-container">
                 <table>
                   <thead>
@@ -370,41 +272,25 @@
                       <th>Created At</th>
                     </tr>
                   </thead>
-                  <tbody id="users-list">
+                  <tbody>
+                    <% if (users.length === 0) { %>
                     <tr>
-                      <td colspan="7">Loading recent users...</td>
+                      <td colspan="7">No users found</td>
                     </tr>
+                    <% } else { %> <% users.forEach(user => { %>
+                    <tr>
+                      <td><%= user.name %></td>
+                      <td><%= user.email %></td>
+                      <td><%= user.details.rollNo %></td>
+                      <td><%= user.course %></td>
+                      <td><%= user.branch %></td>
+                      <td><%= user.semester %></td>
+                      <td><%= new Date(user.createdAt).toLocaleString() %></td>
+                    </tr>
+                    <% }) %> <% } %>
                   </tbody>
                 </table>
-                <div class="mt-4 text-center">
-                  <a
-                    href="/admin/users?token=<%= token %>"
-                    class="flowing-button inline-block"
-                  >
-                    <i class="fas fa-eye mr-2"></i> View All Users
-                  </a>
-                </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="activities-section">
-          <div class="blob-card admin-blob slide-in-left">
-            <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">
-                Recent Activities
-              </h3>
-              <ul class="text-flow">
-                <% if (!activities || activities.length === 0) { %>
-                <li class="opacity-70">No recent activities</li>
-                <% } else { %> <% activities.forEach(activity => { %>
-                <li class="mb-2">
-                  <%= activity.message %> - <%= new
-                  Date(activity.createdAt).toLocaleString() %>
-                </li>
-                <% }) %> <% } %>
-              </ul>
             </div>
           </div>
         </section>
@@ -417,62 +303,12 @@
 
         const sidebar = document.querySelector(".sidebar");
         const toggle = document.querySelector(".sidebar-toggle");
-        const usersList = document.getElementById("users-list");
-
-        if (!sidebar || !toggle || !usersList) {
-          console.error("One or more elements not found:", {
-            sidebar: !!sidebar,
-            toggle: !!toggle,
-            usersList: !!usersList,
+        if (toggle && sidebar) {
+          toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
           });
-          return;
-        }
-
-        toggle.addEventListener("click", () => {
-          sidebar.classList.toggle("active");
-        });
-
-        async function fetchRecentUsers() {
-          try {
-            console.log("Fetching recent users");
-            const response = await fetch(
-              `/api/users/recent?token=${encodeURIComponent("<%= token %>")}`
-            );
-            if (response.ok) {
-              const users = await response.json();
-              usersList.innerHTML = "";
-              if (users.length === 0) {
-                usersList.innerHTML =
-                  '<tr><td colspan="7">No recent users</td></tr>';
-              } else {
-                users.forEach((user) => {
-                  const createdAt = new Date(user.createdAt).toLocaleString();
-                  usersList.innerHTML += `
-                    <tr>
-                      <td>${user.name}</td>
-                      <td>${user.email}</td>
-                      <td>${user.details.rollNo}</td>
-                      <td>${user.course}</td>
-                      <td>${user.branch}</td>
-                      <td>${user.semester}</td>
-                      <td>${createdAt}</td>
-                    </tr>
-                  `;
-                });
-              }
-            } else {
-              console.error(
-                "Failed to fetch recent users:",
-                response.statusText
-              );
-              usersList.innerHTML =
-                '<tr><td colspan="7">Error loading recent users</td></tr>';
-            }
-          } catch (err) {
-            console.error("Error fetching recent users:", err);
-            usersList.innerHTML =
-              '<tr><td colspan="7">Error loading recent users</td></tr>';
-          }
+        } else {
+          console.error("Sidebar or toggle button not found");
         }
 
         function dismissMessage(id) {
@@ -487,12 +323,6 @@
         if (document.getElementById("error-message")) {
           setTimeout(() => dismissMessage("error-message"), 5000);
         }
-        if (document.getElementById("success-message")) {
-          setTimeout(() => dismissMessage("success-message"), 5000);
-        }
-
-        // Fetch recent users on page load
-        fetchRecentUsers();
       });
     </script>
   </body>

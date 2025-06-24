@@ -169,7 +169,7 @@
       }
 
       .input-flow {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.788);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         padding: 0.75rem;
@@ -220,11 +220,52 @@
         box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
       }
 
+      .error-flow {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+      }
+
+      .success-flow {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      }
+
       .calendar-container {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border-radius: 10px;
         padding: 1rem;
+      }
+
+      .recent-attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .recent-attendance-table th,
+      .recent-attendance-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .recent-attendance-table th {
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.05);
       }
     </style>
   </head>
@@ -253,28 +294,42 @@
       </header>
 
       <main class="flowing-grid">
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="success-flow fade-in-flow" id="success-message">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= success %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('success-message')"
+            aria-label="Close success message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %> <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-flow fade-in-flow" id="error-message">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= error %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('error-message')"
+            aria-label="Close error message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %>
         <section class="attendance-section">
           <div class="blob-card attendance-blob slide-in-left">
             <div class="p-8">
               <h3 class="text-2xl font-bold text-flow mb-6">Attendance Form</h3>
-              <% if (error) { %>
-              <div class="error-flow fade-in-flow" id="error-message">
-                <div class="flex items-center">
-                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
-                  <span class="font-semibold text-lg"><%= error %></span>
-                </div>
-                <button
-                  class="text-white hover:text-gray-200"
-                  onclick="dismissMessage()"
-                  aria-label="Close error message"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <% } %>
               <form
                 id="attendance-form"
-                action="/admin/make-attendance?token=<%= token %>"
+                action="/admin/mark-attendance?token=<%= token %>"
                 method="POST"
               >
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
@@ -415,6 +470,42 @@
             </div>
           </div>
         </section>
+
+        <section class="recent-attendance-section mt-8">
+          <div class="blob-card attendance-blob slide-in-left">
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-flow mb-6">
+                Recently Marked Attendance
+              </h3>
+              <% if (recentAttendance && recentAttendance.length > 0) { %>
+              <table class="recent-attendance-table text-flow">
+                <thead>
+                  <tr>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Subject</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% recentAttendance.forEach(record => { %>
+                  <tr>
+                    <td><%= record.studentId %></td>
+                    <td><%= record.studentName %></td>
+                    <td><%= record.subject %></td>
+                    <td><%= new Date(record.date).toLocaleDateString() %></td>
+                    <td><%= record.status %></td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+              <p class="text-flow">No recent attendance records.</p>
+              <% } %>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -459,38 +550,56 @@
 
       async function updateStudents() {
         if (courseSelect.value && branchSelect.value && semesterSelect.value) {
-          const response = await fetch(
-            `/api/students?course=${encodeURIComponent(
-              courseSelect.value
-            )}&branch=${encodeURIComponent(branchSelect.value)}&semester=${
-              semesterSelect.value
-            }&token=${encodeURIComponent("<%= token %>")}`
-          );
-          if (response.ok) {
-            const students = await response.json();
+          try {
+            const response = await fetch(
+              `/api/students?course=${encodeURIComponent(
+                courseSelect.value
+              )}&branch=${encodeURIComponent(branchSelect.value)}&semester=${
+                semesterSelect.value
+              }&token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (response.ok) {
+              const students = await response.json();
+              studentSelect.innerHTML =
+                '<option value="">Select Student</option>';
+              students.forEach((student) => {
+                studentSelect.innerHTML += `<option value="${student._id}">${student.name} (${student.details.rollNo})</option>`;
+              });
+            } else {
+              console.error("Failed to fetch students:", response.statusText);
+              studentSelect.innerHTML =
+                '<option value="">Error loading students</option>';
+            }
+          } catch (err) {
+            console.error("Error fetching students:", err);
             studentSelect.innerHTML =
-              '<option value="">Select Student</option>';
-            students.forEach((student) => {
-              studentSelect.innerHTML += `<option value="${student._id}">${student.name} (${student.details.rollNo})</option>`;
-            });
+              '<option value="">Error loading students</option>';
           }
+        } else {
+          studentSelect.innerHTML = '<option value="">Select Student</option>';
+          subjectSelect.innerHTML = '<option value="">Select Subject</option>';
         }
       }
 
       studentSelect.addEventListener("change", async () => {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
         if (studentSelect.value) {
-          const response = await fetch(
-            `/api/students/${
-              studentSelect.value
-            }/subjects?token=${encodeURIComponent("<%= token %>")}`
-          );
-          if (response.ok) {
-            const subjects = await response.json();
-            subjectSelect.innerHTML =
-              '<option value="">Select Subject</option>';
-            subjects.forEach((subject) => {
-              subjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
-            });
+          try {
+            const response = await fetch(
+              `/api/students/${
+                studentSelect.value
+              }/subjects?token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (response.ok) {
+              const subjects = await response.json();
+              subjects.forEach((subject) => {
+                subjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
+              });
+            } else {
+              console.error("Failed to fetch subjects:", response.statusText);
+              subjectSelect.innerHTML =
+                '<option value="">Error loading subjects</option>';
+            }
 
             const calendarResponse = await fetch(
               `/api/students/${
@@ -500,7 +609,16 @@
             if (calendarResponse.ok) {
               const attendance = await calendarResponse.json();
               renderCalendar(attendance);
+            } else {
+              console.error(
+                "Failed to fetch attendance:",
+                calendarResponse.statusText
+              );
             }
+          } catch (err) {
+            console.error("Error fetching subjects or attendance:", err);
+            subjectSelect.innerHTML =
+              '<option value="">Error loading subjects</option>';
           }
         }
       });
@@ -525,8 +643,8 @@
         });
       }
 
-      function dismissMessage() {
-        const message = document.getElementById("error-message");
+      function dismissMessage(id) {
+        const message = document.getElementById(id);
         if (message) {
           message.style.transition = "opacity 0.5s ease";
           message.style.opacity = "0";
@@ -534,7 +652,10 @@
         }
       }
       if (document.getElementById("error-message")) {
-        setTimeout(dismissMessage, 5000);
+        setTimeout(() => dismissMessage("error-message"), 5000);
+      }
+      if (document.getElementById("success-message")) {
+        setTimeout(() => dismissMessage("success-message"), 5000);
       }
     </script>
   </body>

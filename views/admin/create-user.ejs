@@ -32,13 +32,14 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        );
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -231,6 +232,44 @@
         justify-content: space-between;
         box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
       }
+
+      .success-flow {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      }
+
+      .table-container {
+        overflow-x: auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border-radius: 10px;
+        padding: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      th {
+        background: rgba(255, 255, 255, 0.05);
+      }
     </style>
   </head>
   <body>
@@ -258,25 +297,39 @@
       </header>
 
       <main class="flowing-grid">
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="success-flow fade-in-flow" id="success-message">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= success %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('success-message')"
+            aria-label="Close success message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %> <% if (typeof error !== 'undefined' && error) { %>
+        <div class="error-flow fade-in-flow" id="error-message">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= error %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('error-message')"
+            aria-label="Close error message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %>
         <section class="create-user-section">
           <div class="blob-card create-user-blob slide-in-left">
             <div class="p-8">
               <h3 class="text-2xl font-bold text-flow mb-6">Student Details</h3>
-              <% if (error) { %>
-              <div class="error-flow fade-in-flow" id="error-message">
-                <div class="flex items-center">
-                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
-                  <span class="font-semibold text-lg"><%= error %></span>
-                </div>
-                <button
-                  class="text-white hover:text-gray-200"
-                  onclick="dismissMessage()"
-                  aria-label="Close error message"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <% } %>
               <form
                 action="/admin/create-user?token=<%= token %>"
                 method="POST"
@@ -449,6 +502,38 @@
                   <i class="fas fa-save mr-2"></i> Create User
                 </button>
               </form>
+
+              <div class="table-container mt-8">
+                <h3 class="text-2xl font-bold text-flow mb-4">
+                  Recently Created Users
+                </h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Roll Number</th>
+                      <th>Course</th>
+                      <th>Branch</th>
+                      <th>Semester</th>
+                      <th>Created At</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-users-list">
+                    <tr>
+                      <td colspan="7">Loading recent users...</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="mt-4 text-center">
+                  <a
+                    href="/admin/users?token=<%= token %>"
+                    class="flowing-button inline-block"
+                  >
+                    <i class="fas fa-eye mr-2"></i> Show More
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -457,47 +542,120 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-      const sidebar = document.querySelector(".sidebar");
-      const toggle = document.querySelector(".sidebar-toggle");
-      toggle.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM fully loaded");
 
-      flatpickr(".flatpickr", {
-        dateFormat: "Y-m-d",
-        defaultDate: "2009-06-24",
-        maxDate: new Date(),
-      });
-
-      const courseData = {
-        "B.Tech": ["CSE", "ECE", "CE", "ME", "Chemical"],
-        BCA: ["General", "Data Science"],
-        BBA: ["General", "Marketing"],
-        MBA: ["Finance", "HR"],
-      };
-
-      const courseSelect = document.getElementById("course");
-      const branchSelect = document.getElementById("branch");
-
-      courseSelect.addEventListener("change", () => {
-        const branches = courseData[courseSelect.value] || [];
-        branchSelect.innerHTML = '<option value="">Select Branch</option>';
-        branches.forEach((branch) => {
-          branchSelect.innerHTML += `<option value="${branch}">${branch}</option>`;
-        });
-      });
-
-      function dismissMessage() {
-        const message = document.getElementById("error-message");
-        if (message) {
-          message.style.transition = "opacity 0.5s ease";
-          message.style.opacity = "0";
-          setTimeout(() => message.remove(), 500);
+        const sidebar = document.querySelector(".sidebar");
+        const toggle = document.querySelector(".sidebar-toggle");
+        if (toggle && sidebar) {
+          toggle.addEventListener("click", () => {
+            sidebar.classList.toggle("active");
+          });
+        } else {
+          console.error("Sidebar or toggle button not found");
         }
-      }
-      if (document.getElementById("error-message")) {
-        setTimeout(dismissMessage, 5000);
-      }
+
+        flatpickr(".flatpickr", {
+          dateFormat: "Y-m-d",
+          defaultDate: "2009-06-24",
+          maxDate: new Date(),
+        });
+
+        const courseData = {
+          "B.Tech": ["CSE", "ECE", "CE", "ME", "Chemical"],
+          BCA: ["General", "Data Science"],
+          BBA: ["General", "Marketing"],
+          MBA: ["Finance", "HR"],
+        };
+
+        const courseSelect = document.getElementById("course");
+        const branchSelect = document.getElementById("branch");
+        const recentUsersList = document.getElementById("recent-users-list");
+
+        if (!courseSelect || !branchSelect || !recentUsersList) {
+          console.error("One or more elements not found:", {
+            courseSelect: !!courseSelect,
+            branchSelect: !!branchSelect,
+            recentUsersList: !!recentUsersList,
+          });
+          return;
+        }
+
+        courseSelect.addEventListener("change", () => {
+          console.log("Course selected:", courseSelect.value);
+          const branches = courseData[courseSelect.value] || [];
+          branchSelect.innerHTML = '<option value="">Select Branch</option>';
+          if (branches.length === 0) {
+            console.warn("No branches found for course:", courseSelect.value);
+          } else {
+            branches.forEach((branch) => {
+              branchSelect.innerHTML += `<option value="${branch}">${branch}</option>`;
+            });
+          }
+        });
+
+        async function fetchRecentUsers() {
+          try {
+            console.log("Fetching recent users");
+            const response = await fetch(
+              `/api/users/recent?token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (response.ok) {
+              const users = await response.json();
+              recentUsersList.innerHTML = "";
+              if (users.length === 0) {
+                recentUsersList.innerHTML =
+                  '<tr><td colspan="7">No recent users</td></tr>';
+              } else {
+                users.forEach((user) => {
+                  const createdAt = new Date(user.createdAt).toLocaleString();
+                  recentUsersList.innerHTML += `
+                    <tr>
+                      <td>${user.name}</td>
+                      <td>${user.email}</td>
+                      <td>${user.details.rollNo}</td>
+                      <td>${user.course}</td>
+                      <td>${user.branch}</td>
+                      <td>${user.semester}</td>
+                      <td>${createdAt}</td>
+                    </tr>
+                  `;
+                });
+              }
+            } else {
+              console.error(
+                "Failed to fetch recent users:",
+                response.statusText
+              );
+              recentUsersList.innerHTML =
+                '<tr><td colspan="7">Error loading recent users</td></tr>';
+            }
+          } catch (err) {
+            console.error("Error fetching recent users:", err);
+            recentUsersList.innerHTML =
+              '<tr><td colspan="7">Error loading recent users</td></tr>';
+          }
+        }
+
+        function dismissMessage(id) {
+          const message = document.getElementById(id);
+          if (message) {
+            message.style.transition = "opacity 0.5s ease";
+            message.style.opacity = "0";
+            setTimeout(() => message.remove(), 500);
+          }
+        }
+
+        if (document.getElementById("error-message")) {
+          setTimeout(() => dismissMessage("error-message"), 5000);
+        }
+        if (document.getElementById("success-message")) {
+          setTimeout(() => dismissMessage("success-message"), 5000);
+        }
+
+        // Fetch recent users on page load
+        fetchRecentUsers();
+      });
     </script>
   </body>
 </html>

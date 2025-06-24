@@ -28,9 +28,18 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        background: linear-gradient(
+          135deg,
+          #164172 0%,
+          #3d5f75 100%
+        );
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i{
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -40,7 +49,7 @@
         width: 250px;
         height: 100%;
         background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
         border-right: 1px solid rgba(255, 255, 255, 0.2);
         padding: 2rem 1rem;
         z-index: 1000;
@@ -161,8 +170,8 @@
       }
 
       .input-flow {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.76);
+        border: 1px solid rgba(0, 0, 0, 0.192);
         border-radius: 10px;
         padding: 0.75rem;
         color: white;
@@ -223,6 +232,48 @@
         justify-content: space-between;
         box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
       }
+
+      .success-flow {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+      }
+
+      .teacher-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .teacher-list li {
+        padding: 0.5rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .recent-assignments-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .recent-assignments-table th,
+      .recent-assignments-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .recent-assignments-table th {
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.05);
+      }
     </style>
   </head>
   <body>
@@ -250,27 +301,42 @@
       </header>
 
       <main class="flowing-grid">
+        <% if (success) { %>
+        <div class="success-flow fade-in-flow" id="success-message">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= success %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('success-message')"
+            aria-label="Close success message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %> <% if (error) { %>
+        <div class="error-flow fade-in-flow" id="error-message">
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg"><%= error %></span>
+          </div>
+          <button
+            class="text-white hover:text-gray-200"
+            onclick="dismissMessage('error-message')"
+            aria-label="Close error message"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <% } %>
+
         <section class="create-teacher-section">
           <div class="blob-card assign-teachers-blob slide-in-left">
             <div class="p-8">
               <h3 class="text-2xl font-bold text-flow mb-6">
                 Create New Teacher
               </h3>
-              <% if (error) { %>
-              <div class="error-flow fade-in-flow" id="error-message">
-                <div class="flex items-center">
-                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
-                  <span class="font-semibold text-lg"><%= error %></span>
-                </div>
-                <button
-                  class="text-white hover:text-gray-200"
-                  onclick="dismissMessage()"
-                  aria-label="Close error message"
-                >
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <% } %>
               <form
                 action="/admin/create-teacher?token=<%= token %>"
                 method="POST"
@@ -310,6 +376,21 @@
                   <i class="fas fa-save mr-2"></i> Create Teacher
                 </button>
               </form>
+              <h4 class="text-xl font-semibold text-flow mt-6 mb-4">
+                Existing Teachers
+              </h4>
+              <% if (teachers && teachers.length > 0) { %>
+              <ul class="teacher-list">
+                <% teachers.forEach(teacher => { %>
+                <li class="text-flow">
+                  <span><%= teacher.name %></span>
+                  <span><%= teacher.subject %></span>
+                </li>
+                <% }) %>
+              </ul>
+              <% } else { %>
+              <p class="text-flow">No teachers created yet.</p>
+              <% } %>
             </div>
           </div>
         </section>
@@ -407,7 +488,10 @@
                     >
                       <option value="">Select Teacher</option>
                       <% teachers.forEach(teacher => { %>
-                      <option value="<%= teacher._id %>">
+                      <option
+                        value="<%= teacher._id %>"
+                        data-subject="<%= teacher.subject %>"
+                      >
                         <%= teacher.name %> (<%= teacher.subject %>)
                       </option>
                       <% }) %>
@@ -421,7 +505,7 @@
                     >Subject</label
                   >
                   <select
-                    id="subject"
+                    id="subject2"
                     name="subject"
                     class="input-flow"
                     required
@@ -434,6 +518,42 @@
                   <i class="fas fa-link mr-2"></i> Assign Teacher
                 </button>
               </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="recent-assignments-section mt-8">
+          <div class="blob-card assign-teachers-blob slide-in-left">
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-flow mb-6">
+                Recently Assigned Teachers
+              </h3>
+              <% if (recentAssignments && recentAssignments.length > 0) { %>
+              <table class="recent-assignments-table text-flow">
+                <thead>
+                  <tr>
+                    <th>Teacher ID</th>
+                    <th>Teacher Name</th>
+                    <th>Subject</th>
+                    <th>Assigned to Student</th>
+                    <th>Student ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% recentAssignments.forEach(assignment => { %>
+                  <tr>
+                    <td><%= assignment.teacherId %></td>
+                    <td><%= assignment.teacherName %></td>
+                    <td><%= assignment.subject %></td>
+                    <td><%= assignment.studentName %></td>
+                    <td><%= assignment.studentId %></td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+              <% } else { %>
+              <p class="text-flow">No recent assignments.</p>
+              <% } %>
             </div>
           </div>
         </section>
@@ -458,7 +578,10 @@
       const branchSelect = document.getElementById("branch");
       const semesterSelect = document.getElementById("semester");
       const studentSelect = document.getElementById("student");
-      const subjectSelect = document.getElementById("teacher");
+      const teacherSelect = document.getElementById("teacher");
+      const subjectSelect = document.getElementById("subject2");
+
+      let studentSubjects = []; // Store student's subjects for fallback
 
       courseSelect.addEventListener("change", () => {
         const branches = courseData[courseSelect.value] || [];
@@ -468,6 +591,7 @@
         });
         studentSelect.innerHTML = '<option value="">Select Student</option>';
         subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        studentSubjects = [];
       });
 
       semesterSelect.addEventListener("change", updateStudents);
@@ -475,44 +599,94 @@
 
       async function updateStudents() {
         if (courseSelect.value && branchSelect.value && semesterSelect.value) {
-          const response = await fetch(
-            `/api/students?course=${encodeURIComponent(
-              courseSelect.value
-            )}&branch=${encodeURIComponent(branchSelect.value)}&semester=${
-              semesterSelect.value
-            }&token=${encodeURIComponent("<%= token %>")}`
-          );
-          if (response.ok) {
-            const students = await response.json();
+          try {
+            const response = await fetch(
+              `/api/students?course=${encodeURIComponent(
+                courseSelect.value
+              )}&branch=${encodeURIComponent(branchSelect.value)}&semester=${
+                semesterSelect.value
+              }&token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (response.ok) {
+              const students = await response.json();
+              studentSelect.innerHTML =
+                '<option value="">Select Student</option>';
+              students.forEach((student) => {
+                studentSelect.innerHTML += `<option value="${student._id}">${student.name} (${student.details.rollNo})</option>`;
+              });
+            } else {
+              console.error("Failed to fetch students:", response.statusText);
+              studentSelect.innerHTML =
+                '<option value="">Error loading students</option>';
+            }
+          } catch (err) {
+            console.error("Error fetching students:", err);
             studentSelect.innerHTML =
-              '<option value="">Select Student</option>';
-            students.forEach((student) => {
-              studentSelect.innerHTML += `<option value="${student._id}">${student.name} (${student.details.rollNo})</option>`;
-            });
+              '<option value="">Error loading students</option>';
           }
+        } else {
+          studentSelect.innerHTML = '<option value="">Select Student</option>';
+          subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+          studentSubjects = [];
         }
       }
 
       studentSelect.addEventListener("change", async () => {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        studentSubjects = [];
+        teacherSelect.value = ""; // Reset teacher selection
         if (studentSelect.value) {
-          const response = await fetch(
-            `/api/students/${
-              studentSelect.value
-            }/subjects?token=${encodeURIComponent("<%= token %>")}`
-          );
-          if (response.ok) {
-            const subjects = await response.json();
+          try {
+            const response = await fetch(
+              `/api/students/${
+                studentSelect.value
+              }/subjects?token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (response.ok) {
+              studentSubjects = await response.json();
+              studentSubjects.forEach((subject) => {
+                subjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
+              });
+            } else {
+              console.error("Failed to fetch subjects:", response.statusText);
+              subjectSelect.innerHTML =
+                '<option value="">Error loading subjects</option>';
+            }
+          } catch (err) {
+            console.error("Error fetching subjects:", err);
             subjectSelect.innerHTML =
-              '<option value="">Select Subject</option>';
-            subjects.forEach((subject) => {
-              subjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
-            });
+              '<option value="">Error loading subjects</option>';
           }
         }
       });
 
-      function dismissMessage() {
-        const message = document.getElementById("error-message");
+      teacherSelect.addEventListener("change", () => {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        if (teacherSelect.value) {
+          const selectedOption = teacherSelect.querySelector(
+            `option[value="${teacherSelect.value}"]`
+          );
+          const teacherSubject = selectedOption
+            ? selectedOption.getAttribute("data-subject")
+            : null;
+          if (teacherSubject) {
+            subjectSelect.innerHTML += `<option value="${teacherSubject}">${teacherSubject}</option>`;
+            subjectSelect.value = teacherSubject; // Auto-select the subject
+          } else {
+            console.error("Teacher subject not found");
+            subjectSelect.innerHTML =
+              '<option value="">No subject available</option>';
+          }
+        } else {
+          // Restore student's subjects if no teacher is selected
+          studentSubjects.forEach((subject) => {
+            subjectSelect.innerHTML += `<option value="${subject}">${subject}</option>`;
+          });
+        }
+      });
+
+      function dismissMessage(id) {
+        const message = document.getElementById(id);
         if (message) {
           message.style.transition = "opacity 0.5s ease";
           message.style.opacity = "0";
@@ -520,7 +694,10 @@
         }
       }
       if (document.getElementById("error-message")) {
-        setTimeout(dismissMessage, 5000);
+        setTimeout(() => dismissMessage("error-message"), 5000);
+      }
+      if (document.getElementById("success-message")) {
+        setTimeout(() => dismissMessage("success-message"), 5000);
       }
     </script>
   </body>
