@@ -41,6 +41,11 @@
         overflow-x: hidden;
       }
 
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
+      }
+
       .sidebar {
         position: fixed;
         top: 0;
@@ -223,6 +228,44 @@
         border-color: #ef4444;
         color: white;
       }
+
+      .flowing-button {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--primary-purple),
+          var(--primary-teal)
+        );
+        background-size: 200% 200%;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        animation: gradientFlow 3s ease infinite;
+      }
+
+      @keyframes gradientFlow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .flowing-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      }
     </style>
   </head>
   <body>
@@ -250,10 +293,12 @@
         <section class="attendance-section">
           <div class="blob-card attendance-blob slide-in-left">
             <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">
-                Overall Attendance Calendar
-              </h3>
-              <div id="attendance-calendar"></div>
+              <div id="overall-attendance-container">
+                <h3 class="text-2xl font-bold text-flow mb-4">
+                  Overall Attendance Calendar
+                </h3>
+                <div id="attendance-calendar"></div>
+              </div>
               <h3 class="text-2xl font-bold text-flow mt-8 mb-4">
                 Subject-wise Attendance
               </h3>
@@ -292,10 +337,20 @@
                 </table>
               </div>
               <div id="subject-calendar-container" class="mt-8 hidden">
-                <h3
-                  class="text-2xl font-bold text-flow mb-4"
-                  id="subject-calendar-title"
-                ></h3>
+                <div class="flex items-center justify-between mb-4">
+                  <h3
+                    class="text-2xl font-bold text-flow"
+                    id="subject-calendar-title"
+                  ></h3>
+                  <button
+                    id="back-to-overall"
+                    class="flowing-button"
+                    onclick="showOverallCalendar()"
+                  >
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Overall
+                    Attendance
+                  </button>
+                </div>
                 <div id="subject-calendar"></div>
               </div>
             </div>
@@ -318,23 +373,56 @@
         `<%- JSON.stringify(user.attendance).replace(/<\/script/g, '<\\/script') %>`
       );
 
+      // Validate and format dates
+      const validAttendanceData = attendanceData
+        .filter((record) => {
+          const date = new Date(record.date);
+          if (isNaN(date.getTime())) {
+            console.warn(
+              `Invalid date format for record: ${JSON.stringify(record)}`
+            );
+            return false;
+          }
+          return true;
+        })
+        .map((record) => ({
+          ...record,
+          date: new Date(record.date).toISOString().split("T")[0], // Ensure YYYY-MM-DD
+        }));
+
       // Overall calendar
       const calendarEl = document.getElementById("attendance-calendar");
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: "dayGridMonth",
-        events: attendanceData.map((record) => ({
-          title: record.subject + ": " + record.status,
-          start: record.date,
-          classNames:
-            record.status === "Present"
-              ? ["fc-event-present"]
-              : ["fc-event-absent"],
-        })),
-        eventDidMount: function (info) {
-          info.el.setAttribute("title", info.event.title); // Simple tooltip
-        },
-      });
-      calendar.render();
+      const overallContainer = document.getElementById(
+        "overall-attendance-container"
+      );
+      let calendar = null;
+
+      function renderOverallCalendar() {
+        if (calendar) {
+          calendar.destroy();
+        }
+        calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: "dayGridMonth",
+          events: validAttendanceData.map((record) => ({
+            title: `${record.subject}: ${record.status}`,
+            start: record.date,
+            classNames:
+              record.status === "Present"
+                ? ["fc-event-present"]
+                : ["fc-event-absent"],
+          })),
+          eventDidMount: function (info) {
+            info.el.setAttribute("title", info.event.title); // Tooltip
+          },
+          eventsSet: function () {
+            if (validAttendanceData.length === 0) {
+              calendarEl.innerHTML =
+                '<p class="text-flow text-center opacity-70">No attendance records available</p>';
+            }
+          },
+        });
+        calendar.render();
+      }
 
       // Subject-specific calendar
       const subjectLinks = document.querySelectorAll(".subject-link");
@@ -346,10 +434,21 @@
       );
       let subjectCalendar = null;
 
+      function showOverallCalendar() {
+        subjectCalendarContainer.classList.add("hidden");
+        overallContainer.classList.remove("hidden");
+        if (subjectCalendar) {
+          subjectCalendar.destroy();
+          subjectCalendar = null;
+        }
+        renderOverallCalendar();
+      }
+
       subjectLinks.forEach((link) => {
         link.addEventListener("click", () => {
           const subject = link.dataset.subject;
           subjectCalendarTitle.textContent = `${subject} Attendance`;
+          overallContainer.classList.add("hidden");
           subjectCalendarContainer.classList.remove("hidden");
 
           if (subjectCalendar) {
@@ -359,7 +458,7 @@
           const subjectCalendarEl = document.getElementById("subject-calendar");
           subjectCalendar = new FullCalendar.Calendar(subjectCalendarEl, {
             initialView: "dayGridMonth",
-            events: attendanceData
+            events: validAttendanceData
               .filter((record) => record.subject === subject)
               .map((record) => ({
                 title: record.status,
@@ -372,10 +471,28 @@
             eventDidMount: function (info) {
               info.el.setAttribute("title", info.event.title);
             },
+            eventsSet: function () {
+              if (
+                validAttendanceData.filter(
+                  (record) => record.subject === subject
+                ).length === 0
+              ) {
+                subjectCalendarEl.innerHTML =
+                  '<p class="text-flow text-center opacity-70">No attendance records for this subject</p>';
+              }
+            },
           });
           subjectCalendar.render();
         });
       });
+
+      // Initial render
+      if (validAttendanceData.length > 0) {
+        renderOverallCalendar();
+      } else {
+        calendarEl.innerHTML =
+          '<p class="text-flow text-center opacity-70">No attendance records available</p>';
+      }
     </script>
   </body>
 </html>

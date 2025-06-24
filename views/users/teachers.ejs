@@ -20,6 +20,10 @@
       :root {
         --primary-blue: #3b82f6;
         --primary-purple: #8b5cf6;
+        --primary-teal: #06b6d4;
+        --primary-pink: #ec4899;
+        --primary-indigo: #6366f1;
+        --accent-orange: #f97316;
       }
 
       body {
@@ -28,9 +32,14 @@
           135deg,
           #164172 0%,
           #3d5f75 100%
-        );/* Neutral background */
+        ); /* Neutral background */
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -165,7 +174,7 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 20px;
-        padding: 1rem;
+        padding: 1.5rem;
         margin-bottom: 1rem;
         transition: all 0.3s ease;
       }
@@ -173,6 +182,10 @@
       .teacher-item:hover {
         transform: translateX(10px);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .teacher-details p {
+        margin-bottom: 0.5rem;
       }
     </style>
   </head>
@@ -210,14 +223,27 @@
                   No teachers assigned
                 </p>
                 <% } else { %> <% user.teachers.forEach((teacher, index) => { %>
-                <div
-                  class="teacher-item text-flow"
-                >
+                <div class="teacher-item text-flow">
                   <div class="flex items-center">
                     <i
                       class="fas fa-chalkboard-teacher text-white text-xl mr-4"
                     ></i>
-                    <p class="font-semibold"><%= teacher %></p>
+                    <div class="teacher-details">
+                      <% if (teacher.teacherId) { %>
+                      <p class="font-semibold text-lg">
+                        <%= teacher.teacherId.name %> (<%= teacher.subject %>)
+                      </p>
+                      <p class="opacity-70 text-sm">
+                        Assigned on: <%= new
+                        Date(teacher.assignedAt).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric' }) %>
+                      </p>
+                      <% } else { %>
+                      <p class="font-semibold text-lg text-red-400">
+                        Teacher data unavailable
+                      </p>
+                      <% } %>
+                    </div>
                   </div>
                 </div>
                 <% }) %> <% } %>

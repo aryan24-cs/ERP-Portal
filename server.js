@@ -7,6 +7,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const { v2: cloudinary } = require("cloudinary");
+const moment = require("moment");
 const axios = require("axios");
 require("dotenv").config();
 
@@ -75,7 +76,6 @@ const userSchema = new mongoose.Schema({
   ],
   details: {
     rollNo: { type: String, unique: true },
-    class: String,
     phone: String,
     dob: String,
     fatherName: String,
@@ -98,6 +98,7 @@ const documentSchema = new mongoose.Schema({
   fileType: String,
   fileUrl: String,
   publicId: String,
+  originalFilename: String,
   semester: String,
   createdAt: { type: Date, default: Date.now },
   studentName: String,
@@ -116,7 +117,7 @@ const ActivitySchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const Document = mongoose.model("Document", documentSchema);
 const Teacher = mongoose.model("Teacher", teacherSchema);
-const Activity = mongoose.model("Activity", ActivitySchema); // Register Activity model
+const Activity = mongoose.model("Activity", ActivitySchema);
 
 // Nodemailer Setup
 const transporter = nodemailer.createTransport({
@@ -258,6 +259,29 @@ app.get("/users/user", authMiddleware("user"), async (req, res) => {
   });
 });
 
+app.get("/users/update-profile", authMiddleware("user"), async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.redirect("/login?error=User not found");
+    }
+    const token = req.query.token || "";
+    res.render("users/update-profile", {
+      user,
+      token,
+      success: req.query.success || null,
+      error: req.query.error || null,
+    });
+  } catch (err) {
+    console.error("Error rendering update-profile page:", err);
+    res.redirect(
+      `/login?error=${encodeURIComponent(
+        "Failed to load profile page: " + err.message
+      )}`
+    );
+  }
+});
+
 app.get("/users/attendance", authMiddleware("user"), async (req, res) => {
   const user = await User.findById(req.user.id);
   const subjects = [
@@ -300,33 +324,27 @@ app.post("/users/update-profile", authMiddleware("user"), async (req, res) => {
   // Validate phone
   const phonePattern = /^\d{10,15}$/;
   if (!phonePattern.test(phone.trim())) {
-    return res.render("users/user", {
-      user,
-      documents,
-      success: null,
-      error: "Phone number must be 10-15 digits",
-      token,
-    });
+    return res.redirect(
+      `/users/update-profile?token=${token}&error=${encodeURIComponent(
+        "Phone number must be 10-15 digits"
+      )}`
+    );
   }
 
   // Validate address
   if (!address.trim()) {
-    return res.render("users/user", {
-      user,
-      documents,
-      success: null,
-      error: "Address is required",
-      token,
-    });
+    return res.redirect(
+      `/users/update-profile?token=${token}&error=${encodeURIComponent(
+        "Address is required"
+      )}`
+    );
   }
   if (address.length > 200) {
-    return res.render("users/user", {
-      user,
-      documents,
-      success: null,
-      error: "Address cannot exceed 200 characters",
-      token,
-    });
+    return res.redirect(
+      `/users/update-profile?token=${token}&error=${encodeURIComponent(
+        "Address cannot exceed 200 characters"
+      )}`
+    );
   }
 
   try {
@@ -334,37 +352,65 @@ app.post("/users/update-profile", authMiddleware("user"), async (req, res) => {
       { _id: req.user.id },
       { "details.phone": phone.trim(), "details.address": address.trim() }
     );
-    const updatedUser = await User.findById(req.user.id);
-    res.render("users/user", {
-      user: updatedUser,
-      documents,
-      success: "Profile updated successfully",
-      error: null,
-      token,
-    });
+    res.redirect(
+      `/users/update-profile?token=${token}&success=${encodeURIComponent(
+        "Profile updated successfully"
+      )}`
+    );
   } catch (err) {
     console.error("Profile update error:", err);
-    res.render("users/user", {
-      user,
-      documents,
-      success: null,
-      error: "Failed to update profile. Please try again.",
-      token,
-    });
+    res.redirect(
+      `/users/update-profile?token=${token}&error=${encodeURIComponent(
+        "Failed to update profile. Please try again."
+      )}`
+    );
   }
 });
 
 app.get("/users/download/:publicId", authMiddleware(), async (req, res) => {
   try {
     const publicId = req.params.publicId;
-    const document = await Document.findOne({ publicId });
+    const document = await Document.findOne({
+      publicId: `erp-portal/${publicId}`,
+    });
     if (!document) {
       console.error("Document not found for publicId:", publicId);
       return res.status(404).send("Document not found");
     }
 
-    // Redirect to Cloudinary's secure URL for download
-    res.redirect(document.fileUrl);
+    // Fetch the file from Cloudinary
+    const response = await axios.get(document.fileUrl, {
+      responseType: "stream",
+    });
+
+    // Set content type based on fileType
+    let contentType;
+    switch (document.fileType.toLowerCase()) {
+      case "pdf":
+        contentType = "application/pdf";
+        break;
+      case "image":
+      case "jpg":
+      case "jpeg":
+        contentType = "image/jpeg";
+        break;
+      case "png":
+        contentType = "image/png";
+        break;
+      default:
+        contentType = "application/octet-stream";
+    }
+
+    // Set headers for download
+    res.set({
+      "Content-Type": contentType,
+      "Content-Disposition": `attachment; filename="${
+        document.originalFilename || document.fileType
+      }"`,
+    });
+
+    // Stream the file to the client
+    response.data.pipe(res);
   } catch (err) {
     console.error("Error downloading document:", err);
     res
@@ -378,7 +424,9 @@ app.get("/api/documents/recent", authMiddleware(), async (req, res) => {
     const documents = await Document.find()
       .sort({ createdAt: -1 })
       .limit(5)
-      .select("studentName userId fileType semester publicId createdAt");
+      .select(
+        "studentName userId fileType semester publicId createdAt originalFilename"
+      );
     res.json(documents);
   } catch (err) {
     console.error("Error fetching recent documents:", err);
@@ -387,6 +435,7 @@ app.get("/api/documents/recent", authMiddleware(), async (req, res) => {
       .json({ error: "Failed to fetch recent documents: " + err.message });
   }
 });
+
 app.get("/admin/users", authMiddleware(), async (req, res) => {
   try {
     const users = await User.find({ role: "user" })
@@ -405,7 +454,12 @@ app.get("/admin/users", authMiddleware(), async (req, res) => {
 
 app.get("/admin", authMiddleware("admin"), async (req, res) => {
   try {
-    const admin = req.user; // From authMiddleware
+    const admin = await User.findById(req.user.id).select("name email role");
+    if (!admin) {
+      return res.redirect(
+        `/login?error=${encodeURIComponent("Admin user not found")}`
+      );
+    }
     const activities = await Activity.find()
       .sort({ createdAt: -1 })
       .limit(5)
@@ -414,13 +468,14 @@ app.get("/admin", authMiddleware("admin"), async (req, res) => {
       token: req.query.token,
       admin,
       activities,
-      success: req.query.success,
-      error: req.query.error,
+      success: req.query.success || null,
+      error: req.query.error || null,
+      currentPage: "admin",
     });
   } catch (err) {
     console.error("Error rendering admin dashboard:", err);
     res.redirect(
-      `/admin?token=${req.query.token}&error=${encodeURIComponent(
+      `/login?error=${encodeURIComponent(
         "Failed to load dashboard: " + err.message
       )}`
     );
@@ -451,7 +506,6 @@ app.post("/admin/create-user", authMiddleware("admin"), async (req, res) => {
       address,
     } = req.body;
 
-    // Validate input
     if (
       !name ||
       !email ||
@@ -472,7 +526,6 @@ app.post("/admin/create-user", authMiddleware("admin"), async (req, res) => {
       );
     }
 
-    // Check if email or rollNo already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { "details.rollNo": rollNo }],
     });
@@ -484,11 +537,9 @@ app.post("/admin/create-user", authMiddleware("admin"), async (req, res) => {
       );
     }
 
-    // Generate random password
     const password = Math.random().toString(36).slice(-8);
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const user = new User({
       name,
       email,
@@ -510,12 +561,10 @@ app.post("/admin/create-user", authMiddleware("admin"), async (req, res) => {
 
     await user.save();
 
-    // Log activity
     await new Activity({
       message: `User ${name} created by admin ${req.user.email}`,
     }).save();
 
-    // Send email with credentials
     await sendEmail(
       email,
       "Your ERP Portal Account",
@@ -602,6 +651,17 @@ app.post(
       req.body;
     const token = req.body.token || req.query.token || "";
     try {
+      const normalizedDate = moment(date, ["YYYY-MM-DD", "MM/DD/YYYY"], true);
+      if (!normalizedDate.isValid()) {
+        return res.render("admin/make-attendance", {
+          token,
+          error: "Invalid date format. Please use YYYY-MM-DD or MM/DD/YYYY.",
+          success: null,
+          recentAttendance: [],
+        });
+      }
+      const formattedDate = normalizedDate.format("YYYY-MM-DD");
+
       const user = await User.findById(studentId);
       if (!user) {
         return res.render("admin/make-attendance", {
@@ -611,10 +671,9 @@ app.post(
           recentAttendance: [],
         });
       }
-      user.attendance.push({ date, subject, status });
+      user.attendance.push({ date: formattedDate, subject, status });
       await user.save();
 
-      // Log activity
       await new Activity({
         message: `Attendance marked for ${user.name} (${subject}: ${status}) by admin ${req.user.email}`,
       }).save();
@@ -677,7 +736,6 @@ app.post("/admin/edit-user", authMiddleware("admin"), async (req, res) => {
       details: { rollNo, phone, dob, fatherName, motherName, address },
     });
 
-    // Log activity
     await new Activity({
       message: `User ${name} updated by admin ${req.user.email}`,
     }).save();
@@ -742,12 +800,12 @@ app.post(
         fileType,
         fileUrl: uploadResult.secure_url,
         publicId: uploadResult.public_id,
+        originalFilename: req.file.originalname,
         semester,
         studentName: user.name,
       });
       await document.save();
 
-      // Log activity
       await new Activity({
         message: `Document ${fileType} uploaded for ${user.name} (Semester ${semester}) by admin ${req.user.email}`,
       }).save();
@@ -781,6 +839,87 @@ app.post(
     }
   }
 );
+
+app.get("/admin/college", authMiddleware("admin"), async (req, res) => {
+  try {
+    const token = req.query.token || "";
+    const students = await User.find({ role: "user" }).select(
+      "name email course branch semester details"
+    );
+    const teachers = await Teacher.find().select("name subject");
+    const courses = await User.aggregate([
+      { $match: { role: "user", course: { $ne: null } } },
+      { $group: { _id: "$course", studentCount: { $sum: 1 } } },
+      { $project: { name: "$_id", studentCount: 1, _id: 0 } },
+      { $sort: { name: 1 } },
+    ]);
+    const branches = await User.aggregate([
+      {
+        $match: { role: "user", course: { $ne: null }, branch: { $ne: null } },
+      },
+      {
+        $group: {
+          _id: { course: "$course", branch: "$branch" },
+          studentCount: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          course: "$_id.course",
+          name: "$_id.branch",
+          studentCount: 1,
+          _id: 0,
+        },
+      },
+      { $sort: { course: 1, name: 1 } },
+    ]);
+    const assignments = await User.aggregate([
+      { $match: { role: "user", teachers: { $ne: [] } } },
+      { $unwind: "$teachers" },
+      {
+        $lookup: {
+          from: "teachers",
+          localField: "teachers.teacherId",
+          foreignField: "_id",
+          as: "teacher",
+        },
+      },
+      { $unwind: "$teacher" },
+      {
+        $project: {
+          teacherId: "$teachers.teacherId",
+          teacherName: "$teacher.name",
+          subject: "$teachers.subject",
+          studentName: "$name",
+          studentId: "$_id",
+          course: "$course",
+          branch: "$branch",
+          semester: "$semester",
+          assignedAt: "$teachers.assignedAt",
+        },
+      },
+      { $sort: { assignedAt: -1 } },
+    ]);
+    res.render("admin/college", {
+      token,
+      courses: courses || [],
+      branches: branches || [],
+      students: students || [],
+      teachers: teachers || [],
+      assignments: assignments || [],
+      success: req.query.success || null,
+      error: req.query.error || null,
+      currentPage: "college",
+    });
+  } catch (err) {
+    console.error("Error rendering college structure:", err);
+    res.redirect(
+      `/admin?token=${req.query.token}&error=${encodeURIComponent(
+        "Failed to load college structure: " + err.message
+      )}`
+    );
+  }
+});
 
 app.get("/admin/assign-teachers", authMiddleware("admin"), async (req, res) => {
   try {
@@ -862,7 +1001,6 @@ app.post("/admin/create-teacher", authMiddleware("admin"), async (req, res) => {
     const teacher = new Teacher({ name, subject });
     await teacher.save();
 
-    // Log activity
     await new Activity({
       message: `Teacher ${name} (${subject}) created by admin ${req.user.email}`,
     }).save();
@@ -906,7 +1044,6 @@ app.post("/admin/assign-teacher", authMiddleware("admin"), async (req, res) => {
     user.teachers.push({ teacherId, subject, assignedAt: new Date() });
     await user.save();
 
-    // Log activity
     await new Activity({
       message: `Teacher ${teacher.name} (${subject}) assigned to ${user.name} by admin ${req.user.email}`,
     }).save();
@@ -953,7 +1090,7 @@ app.get(
 app.get("/api/students/:id/documents", authMiddleware(), async (req, res) => {
   try {
     const documents = await Document.find({ userId: req.params.id }).select(
-      "studentName userId fileType semester fileUrl publicId createdAt"
+      "studentName userId fileType semester fileUrl publicId createdAt originalFilename"
     );
     res.json(documents);
   } catch (err) {

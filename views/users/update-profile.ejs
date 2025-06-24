@@ -28,13 +28,14 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        ); /* Neutral background */
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -115,7 +116,7 @@
       }
 
       .blob-card {
-        background: rgba(22, 21, 21, 0.15); /* Darker blob background */
+        background: rgba(22, 21, 21, 0.15);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
@@ -124,177 +125,15 @@
         overflow: hidden;
       }
 
-      .blob-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          45deg,
-          rgba(255, 255, 255, 0.1),
-          rgba(255, 255, 255, 0.05)
-        );
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .blob-card:hover::before {
-        opacity: 1;
-      }
-
       .blob-card:hover {
         transform: translateY(-15px) scale(1.02);
         box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
       }
 
       .update-profile-blob {
-        border-radius: 60px 25px 60px 25px;
-        transform: rotate(-2deg);
-        margin: 2rem 1rem;
-      }
-
-      .organic-header {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.2),
-          rgba(255, 255, 255, 0.1)
-        );
-        backdrop-filter: blur(30px);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        margin: 0 2rem;
-        margin-bottom: 3rem;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .organic-header::after {
-        content: "";
-        position: absolute;
-        bottom: -50px;
-        left: 50%;
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(
-          45deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        border-radius: 50%;
-        transform: translateX(-50%);
-        opacity: 0.3;
-      }
-
-      .flowing-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      .icon-bubble {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        position: relative;
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-      }
-
-      .flowing-button {
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple),
-          var(--primary-teal)
-        );
-        background-size: 200% 200%;
-        border: none;
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-        animation: gradientFlow 3s ease infinite;
-      }
-
-      @keyframes gradientFlow {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      .flowing-button:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
-      }
-
-      .success-flow {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 30px;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        animation: successPulse 2s ease infinite;
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-      }
-
-      @keyframes successPulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.02);
-        }
-      }
-
-      .error-flow {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 30px;
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        border-radius: 50px 30px 50px 30px;
+        transform: rotate(-1deg);
+        margin: 1.5rem 0.5rem;
       }
 
       .text-flow {
@@ -341,6 +180,95 @@
         border-color: var(--primary-blue);
         box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
       }
+
+      .input-flow.invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+      }
+
+      .flowing-button {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--primary-purple),
+          var(--primary-teal)
+        );
+        background-size: 200% 200%;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        animation: gradientFlow 3s ease infinite;
+      }
+
+      .flowing-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      @keyframes gradientFlow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .flowing-button:hover:not(:disabled) {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      }
+
+      .success-flow {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        animation: fadeInFlow 0.5s ease-out;
+      }
+
+      .error-flow {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        animation: fadeInFlow 0.5s ease-out;
+      }
+
+      .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+
+      .helper-text {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+
+      .helper-text.error {
+        color: #ef4444;
+      }
     </style>
   </head>
   <body>
@@ -355,7 +283,7 @@
         <div class="px-8 py-6">
           <div class="flex items-center">
             <div class="icon-bubble mr-6">
-              <i class="fas fa-edit"></i>
+              <i class="fas fa-user-edit"></i>
             </div>
             <div>
               <h1 class="text-3xl font-bold text-flow">Update Profile</h1>
@@ -374,7 +302,21 @@
               <h3 class="text-2xl font-bold text-flow mb-6">
                 Edit Your Information
               </h3>
-              <% if (error) { %>
+              <% if (success) { %>
+              <div class="success-flow fade-in-flow" id="success-message">
+                <div class="flex items-center">
+                  <i class="fas fa-check-circle text-2xl mr-4"></i>
+                  <span class="font-semibold text-lg"><%= success %></span>
+                </div>
+                <button
+                  class="text-white hover:text-gray-200"
+                  onclick="dismissMessage('success-message')"
+                  aria-label="Close success message"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <% } %> <% if (error) { %>
               <div class="error-flow fade-in-flow" id="error-message">
                 <div class="flex items-center">
                   <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
@@ -382,7 +324,7 @@
                 </div>
                 <button
                   class="text-white hover:text-gray-200"
-                  onclick="dismissMessage()"
+                  onclick="dismissMessage('error-message')"
                   aria-label="Close error message"
                 >
                   <i class="fas fa-times"></i>
@@ -390,10 +332,12 @@
               </div>
               <% } %>
               <form
+                id="update-profile-form"
                 action="/users/update-profile?token=<%= token %>"
                 method="POST"
+                onsubmit="handleSubmit(event)"
               >
-                <div class="mb-4">
+                <div class="form-group">
                   <label for="phone" class="block text-flow font-semibold mb-2"
                     >Phone Number</label
                   >
@@ -406,9 +350,13 @@
                     required
                     pattern="\d{10,15}"
                     title="Phone number must be 10-15 digits"
+                    oninput="validatePhone(this)"
                   />
+                  <p id="phone-helper" class="helper-text">
+                    Enter 10-15 digits
+                  </p>
                 </div>
-                <div class="mb-6">
+                <div class="form-group">
                   <label
                     for="address"
                     class="block text-flow font-semibold mb-2"
@@ -421,14 +369,30 @@
                     rows="4"
                     required
                     maxlength="200"
+                    oninput="validateAddress(this)"
                   >
 <%= user.details.address %></textarea
                   >
+                  <p id="address-helper" class="helper-text">
+                    Maximum 200 characters
+                  </p>
                 </div>
                 <input type="hidden" name="token" value="<%= token %>" />
-                <button type="submit" class="flowing-button">
-                  <i class="fas fa-save mr-2"></i> Save Changes
-                </button>
+                <div class="flex space-x-4">
+                  <button
+                    type="submit"
+                    id="submit-button"
+                    class="flowing-button"
+                  >
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                  </button>
+                  <a
+                    href="/users/user?token=<%= token %>"
+                    class="flowing-button bg-gray-600 hover:bg-gray-700"
+                  >
+                    <i class="fas fa-times mr-2"></i> Cancel
+                  </a>
+                </div>
               </form>
             </div>
           </div>
@@ -445,16 +409,141 @@
       });
 
       // Auto-dismiss messages
-      function dismissMessage() {
-        const message = document.getElementById("error-message");
+      function dismissMessage(id) {
+        const message = document.getElementById(id);
         if (message) {
           message.style.transition = "opacity 0.5s ease";
           message.style.opacity = "0";
           setTimeout(() => message.remove(), 500);
         }
       }
+
+      if (document.getElementById("success-message")) {
+        setTimeout(() => dismissMessage("success-message"), 5000);
+      }
       if (document.getElementById("error-message")) {
-        setTimeout(dismissMessage, 5000);
+        setTimeout(() => dismissMessage("error-message"), 5000);
+      }
+
+      // Real-time phone validation
+      function validatePhone(input) {
+        const helper = document.getElementById("phone-helper");
+        const pattern = /^\d{10,15}$/;
+        if (!pattern.test(input.value)) {
+          input.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Please enter 10-15 digits";
+        } else {
+          input.classList.remove("invalid");
+          helper.classList.remove("error");
+          helper.textContent = "Enter 10-15 digits";
+        }
+      }
+
+      // Real-time address validation
+      function validateAddress(textarea) {
+        const helper = document.getElementById("address-helper");
+        if (!textarea.value.trim()) {
+          textarea.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Address is required";
+        } else if (textarea.value.length > 200) {
+          textarea.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Address cannot exceed 200 characters";
+        } else {
+          textarea.classList.remove("invalid");
+          helper.classList.remove("error");
+          helper.textContent = `Maximum 200 characters (${textarea.value.length}/200)`;
+        }
+      }
+
+      // Form submission with loading state
+      async function handleSubmit(event) {
+        event.preventDefault();
+        const form = document.getElementById("update-profile-form");
+        const submitButton = document.getElementById("submit-button");
+        const phoneInput = document.getElementById("phone");
+        const addressInput = document.getElementById("address");
+
+        // Client-side validation
+        const phonePattern = /^\d{10,15}$/;
+        if (!phonePattern.test(phoneInput.value.trim())) {
+          const helper = document.getElementById("phone-helper");
+          phoneInput.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Please enter 10-15 digits";
+          return;
+        }
+        if (!addressInput.value.trim()) {
+          const helper = document.getElementById("address-helper");
+          addressInput.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Address is required";
+          return;
+        }
+        if (addressInput.value.length > 200) {
+          const helper = document.getElementById("address-helper");
+          addressInput.classList.add("invalid");
+          helper.classList.add("error");
+          helper.textContent = "Address cannot exceed 200 characters";
+          return;
+        }
+
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i> Saving...';
+
+        try {
+          const formData = new FormData(form);
+          const response = await fetch(form.action, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.redirected) {
+            window.location.href = response.url;
+          } else {
+            const errorData = await response.json();
+            const errorDiv = document.createElement("div");
+            errorDiv.id = "error-message";
+            errorDiv.className = "error-flow fade-in-flow";
+            errorDiv.innerHTML = `
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+                <span class="font-semibold text-lg">${
+                  errorData.error || "Failed to update profile"
+                }</span>
+              </div>
+              <button class="text-white hover:text-gray-200" onclick="dismissMessage('error-message')" aria-label="Close error message">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            form.parentNode.insertBefore(errorDiv, form);
+            setTimeout(() => dismissMessage("error-message"), 5000);
+          }
+        } catch (err) {
+          console.error("Form submission error:", err);
+          const errorDiv = document.createElement("div");
+          errorDiv.id = "error-message";
+          errorDiv.className = "error-flow fade-in-flow";
+          errorDiv.innerHTML = `
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+              <span class="font-semibold text-lg">Failed to update profile: ${err.message}</span>
+            </div>
+            <button class="text-white hover:text-gray-200" onclick="dismissMessage('error-message')" aria-label="Close error message">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          form.parentNode.insertBefore(errorDiv, form);
+          setTimeout(() => dismissMessage("error-message"), 5000);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.innerHTML =
+            '<i class="fas fa-save mr-2"></i> Save Changes';
+        }
       }
     </script>
   </body>

@@ -28,31 +28,9 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        );
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
-      }
-
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 2rem 1rem;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar.hidden {
-        transform: translateX(-100%);
       }
 
       .sidebar-toggle {
@@ -69,36 +47,9 @@
       }
 
       @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-        }
         .sidebar-toggle {
           display: block;
         }
-      }
-
-      .sidebar-nav a {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-      }
-
-      .sidebar-nav a:hover,
-      .sidebar-nav a.active {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(5px);
-      }
-
-      .sidebar-nav a i {
-        margin-right: 0.75rem;
       }
 
       .morphing-container {
@@ -130,9 +81,9 @@
       }
 
       .admin-blob {
-        border-radius: 60px 25px 60px 25px;
-        transform: rotate(-2deg);
-        margin: 2rem 1rem;
+        border-radius: 50px 30px 50px 30px;
+        transform: rotate(-1deg);
+        margin: 1.5rem 0.5rem;
       }
 
       .text-flow {
@@ -205,17 +156,6 @@
         color: white;
         font-size: 1.5rem;
         box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
       }
 
       .error-flow {
@@ -223,11 +163,12 @@
         color: white;
         padding: 1rem 2rem;
         border-radius: 30px;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        animation: fadeInFlow 0.5s ease-out;
       }
 
       .success-flow {
@@ -235,11 +176,12 @@
         color: white;
         padding: 1rem 2rem;
         border-radius: 30px;
-        margin-bottom: 2rem;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        animation: fadeInFlow 0.5s ease-out;
       }
 
       .flowing-button {
@@ -277,6 +219,22 @@
         transform: translateY(-3px) scale(1.05);
         box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
       }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--primary-blue);
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
   </head>
   <body>
@@ -301,7 +259,7 @@
       </header>
 
       <main class="flowing-grid">
-        <% if (typeof success !== 'undefined' && success) { %>
+        <% if (success) { %>
         <div class="success-flow fade-in-flow" id="success-message">
           <div class="flex items-center">
             <i class="fas fa-check-circle text-2xl mr-4"></i>
@@ -315,7 +273,7 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <% } %> <% if (typeof error !== 'undefined' && error) { %>
+        <% } %> <% if (error) { %>
         <div class="error-flow fade-in-flow" id="error-message">
           <div class="flex items-center">
             <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
@@ -340,11 +298,15 @@
                   <tbody>
                     <tr>
                       <td>Name</td>
-                      <td>Sunil Baghel</td>
+                      <td>
+                        <%= admin && admin.name ? admin.name : 'Unknown' %>
+                      </td>
                     </tr>
                     <tr>
                       <td>Email</td>
-                      <td>sunilbaghel93100@gmail.com</td>
+                      <td>
+                        <%= admin && admin.email ? admin.email : 'Unknown' %>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -372,7 +334,10 @@
                   </thead>
                   <tbody id="users-list">
                     <tr>
-                      <td colspan="7">Loading recent users...</td>
+                      <td colspan="7" class="text-center">
+                        <span class="loading-spinner"></span> Loading recent
+                        users...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -413,68 +378,10 @@
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM fully loaded");
+        // Debug admin object
+        // console.log("Admin object:", <%- JSON.stringify(admin || {}) %>);
 
-        const sidebar = document.querySelector(".sidebar");
-        const toggle = document.querySelector(".sidebar-toggle");
-        const usersList = document.getElementById("users-list");
-
-        if (!sidebar || !toggle || !usersList) {
-          console.error("One or more elements not found:", {
-            sidebar: !!sidebar,
-            toggle: !!toggle,
-            usersList: !!usersList,
-          });
-          return;
-        }
-
-        toggle.addEventListener("click", () => {
-          sidebar.classList.toggle("active");
-        });
-
-        async function fetchRecentUsers() {
-          try {
-            console.log("Fetching recent users");
-            const response = await fetch(
-              `/api/users/recent?token=${encodeURIComponent("<%= token %>")}`
-            );
-            if (response.ok) {
-              const users = await response.json();
-              usersList.innerHTML = "";
-              if (users.length === 0) {
-                usersList.innerHTML =
-                  '<tr><td colspan="7">No recent users</td></tr>';
-              } else {
-                users.forEach((user) => {
-                  const createdAt = new Date(user.createdAt).toLocaleString();
-                  usersList.innerHTML += `
-                    <tr>
-                      <td>${user.name}</td>
-                      <td>${user.email}</td>
-                      <td>${user.details.rollNo}</td>
-                      <td>${user.course}</td>
-                      <td>${user.branch}</td>
-                      <td>${user.semester}</td>
-                      <td>${createdAt}</td>
-                    </tr>
-                  `;
-                });
-              }
-            } else {
-              console.error(
-                "Failed to fetch recent users:",
-                response.statusText
-              );
-              usersList.innerHTML =
-                '<tr><td colspan="7">Error loading recent users</td></tr>';
-            }
-          } catch (err) {
-            console.error("Error fetching recent users:", err);
-            usersList.innerHTML =
-              '<tr><td colspan="7">Error loading recent users</td></tr>';
-          }
-        }
-
+        // Auto-dismiss messages
         function dismissMessage(id) {
           const message = document.getElementById(id);
           if (message) {
@@ -489,6 +396,48 @@
         }
         if (document.getElementById("success-message")) {
           setTimeout(() => dismissMessage("success-message"), 5000);
+        }
+
+        // Fetch recent users with enhanced error handling
+        async function fetchRecentUsers() {
+          const usersList = document.getElementById("users-list");
+          try {
+            const response = await fetch(
+              `/api/users/recent?token=${encodeURIComponent("<%= token %>")}`
+            );
+            if (!response.ok) {
+              throw new Error(`HTTP error: ${response.statusText}`);
+            }
+            const users = await response.json();
+            usersList.innerHTML = "";
+            if (users.length === 0) {
+              usersList.innerHTML = '<tr><td colspan="7" class="text-center">No recent users</td></tr>';
+            } else {
+              users.forEach((user) => {
+                const createdAt = new Date(user.createdAt).toLocaleString();
+                usersList.innerHTML += `
+                  <tr>
+                    <td>${user.name || 'Unknown'}</td>
+                    <td>${user.email || 'Unknown'}</td>
+                    <td>${user.details && user.details.rollNo ? user.details.rollNo : 'N/A'}</td>
+                    <td>${user.course || 'N/A'}</td>
+                    <td>${user.branch || 'N/A'}</td>
+                    <td>${user.semester || 'N/A'}</td>
+                    <td>${createdAt}</td>
+                  </tr>
+                `;
+              });
+            }
+          } catch (err) {
+            console.error("Error fetching recent users:", err);
+            usersList.innerHTML = `
+              <tr>
+                <td colspan="7" class="text-center">
+                  <span class="text-red-400">Error loading recent users: ${err.message}</span>
+                </td>
+              </tr>
+            `;
+          }
         }
 
         // Fetch recent users on page load

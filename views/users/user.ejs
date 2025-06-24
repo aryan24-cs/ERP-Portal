@@ -139,8 +139,8 @@
         bottom: 0;
         background: linear-gradient(
           45deg,
-          rgba(255, 255, 255, 0.1),
-          rgba(255, 255, 255, 0.05)
+          rgba(24, 23, 23, 0.5),
+          rgba(255, 255, 255, 0.45)
         );
         opacity: 0;
         transition: opacity 0.3s ease;
@@ -469,7 +469,10 @@
                     </tr>
                     <tr>
                       <td>Class</td>
-                      <td><%= user.details.class %></td>
+                      <td>
+                        <%= user.course %>, <%= user.branch %>, Semester <%=
+                        user.semester %>
+                      </td>
                     </tr>
                     <tr>
                       <td>Phone</td>
@@ -534,9 +537,7 @@
                   No documents available for this semester
                 </p>
                 <% } else { %> <% documents.forEach((doc, index) => { %>
-                <div
-                  class="document-item text-flow"
-                >
+                <div class="document-item text-flow">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center">
                       <i class="fas fa-file text-white text-xl mr-4"></i>

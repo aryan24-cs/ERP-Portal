@@ -28,13 +28,14 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        );/* Neutral background */
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
+      }
+
+      .icon-bubble i {
+        color: white;
+        font-size: 32px;
       }
 
       .sidebar {
@@ -115,7 +116,7 @@
       }
 
       .blob-card {
-        background: rgba(22, 21, 21, 0.15); /* Darker blob background */
+        background: rgba(22, 21, 21, 0.15);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
@@ -164,19 +165,31 @@
         }
       }
 
-      .document-item {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
+      .table-container {
+        overflow-x: auto;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(15px);
+        border-radius: 10px;
         padding: 1rem;
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
       }
 
-      .document-item:hover {
-        transform: translateX(10px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: transparent;
+      }
+
+      th,
+      td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      th {
+        background: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
       }
 
       .flowing-button {
@@ -200,6 +213,11 @@
         animation: gradientFlow 3s ease infinite;
       }
 
+      .flowing-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
       @keyframes gradientFlow {
         0% {
           background-position: 0% 50%;
@@ -212,9 +230,18 @@
         }
       }
 
-      .flowing-button:hover {
+      .flowing-button:hover:not(:disabled) {
         transform: translateY(-3px) scale(1.05);
         box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      }
+
+      .error-message {
+        color: #ef4444;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        display: none;
       }
     </style>
   </head>
@@ -243,50 +270,84 @@
         <section class="documents-section">
           <div class="blob-card documents-blob slide-in-left">
             <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">
-                Documents by Semester
-              </h3>
-              <div class="documents-flow">
-                <% const semesters = [...new Set(documents.map(doc =>
-                doc.semester))].sort(); semesters.forEach(semester => { %>
-                <h4 class="text-xl font-semibold text-flow mb-4">
-                  Semester <%= semester %>
-                </h4>
-                <% documents.filter(doc => doc.semester ===
-                semester).forEach((doc, index) => { %>
-                <div
-                  class="document-item text-flow"
-                >
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                      <i class="fas fa-file text-white text-xl mr-4"></i>
-                      <div>
-                        <p class="font-semibold"><%= doc.fileType %></p>
-                        <p class="opacity-70 text-sm">Manage your document</p>
-                      </div>
-                    </div>
-                    <div class="flex space-x-2">
-                      <a
-                        href="<%= doc.fileUrl %>"
-                        target="_blank"
-                        class="flowing-button"
-                      >
-                        <i class="fas fa-eye mr-2"></i> View
-                      </a>
-                      <a
-                        href="/users/download/<%= doc.publicId.split('/').pop() %>?token=<%= token %>"
-                        class="flowing-button"
-                      >
-                        <i class="fas fa-download mr-2"></i> Download
-                      </a>
-                    </div>
-                  </div>
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-flow">Your Documents</h3>
+                <div class="flex space-x-4">
+                  <select
+                    id="semester-filter"
+                    class="bg-white bg-opacity-10 text-white border border-white border-opacity-20 rounded-md p-2"
+                  >
+                    <option value="all">All Semesters</option>
+                    <% const semesters = [...new Set(documents.map(doc =>
+                    doc.semester))].sort(); %> <% semesters.forEach(semester =>
+                    { %>
+                    <option value="<%= semester %>">
+                      Semester <%= semester %>
+                    </option>
+                    <% }) %>
+                  </select>
+                  <select
+                    id="sort-by"
+                    class="bg-white bg-opacity-10 text-white border border-white border-opacity-20 rounded-md p-2"
+                  >
+                    <option value="createdAt-desc">Newest First</option>
+                    <option value="createdAt-asc">Oldest First</option>
+                    <option value="fileType-asc">File Type (A-Z)</option>
+                    <option value="originalFilename-asc">Filename (A-Z)</option>
+                  </select>
                 </div>
-                <% }) %> <% }) %> <% if (semesters.length === 0) { %>
-                <p class="text-flow text-center opacity-70">
-                  No documents available
-                </p>
-                <% } %>
+              </div>
+              <div id="error-message" class="error-message"></div>
+              <div class="table-container">
+                <table id="documents-table">
+                  <thead>
+                    <tr>
+                      <th>Filename</th>
+                      <th>File Type</th>
+                      <th>Semester</th>
+                      <th>Uploaded On</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (documents.length === 0) { %>
+                    <tr>
+                      <td colspan="5" class="text-center text-flow opacity-70">
+                        No documents available
+                      </td>
+                    </tr>
+                    <% } else { %> <% documents.forEach((doc, index) => { %>
+                    <tr data-semester="<%= doc.semester %>">
+                      <td><%= doc.originalFilename || doc.fileType %></td>
+                      <td><%= doc.fileType %></td>
+                      <td><%= doc.semester %></td>
+                      <td>
+                        <%= new Date(doc.createdAt).toLocaleDateString('en-US',
+                        { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                      </td>
+                      <td>
+                        <div class="flex space-x-2">
+                          <a
+                            href="<%= doc.fileUrl %>"
+                            target="_blank"
+                            class="flowing-button view-button"
+                          >
+                            <i class="fas fa-eye mr-2"></i> View
+                          </a>
+                          <button
+                            class="flowing-button download-button"
+                            data-public-id="<%= doc.publicId.split('/').pop() %>"
+                            data-filename="<%= doc.originalFilename || doc.fileType %>"
+                            onclick="downloadDocument(this)"
+                          >
+                            <i class="fas fa-download mr-2"></i> Download
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <% }) %> <% } %>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -301,6 +362,96 @@
       toggle.addEventListener("click", () => {
         sidebar.classList.toggle("active");
       });
+
+      // Semester filter
+      const semesterFilter = document.getElementById("semester-filter");
+      const documentsTable = document.getElementById("documents-table");
+      semesterFilter.addEventListener("change", () => {
+        const selectedSemester = semesterFilter.value;
+        const rows = documentsTable.querySelectorAll("tbody tr");
+        rows.forEach((row) => {
+          if (
+            selectedSemester === "all" ||
+            row.dataset.semester === selectedSemester
+          ) {
+            row.style.display = "";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      });
+
+      // Sorting
+      const sortBy = document.getElementById("sort-by");
+      sortBy.addEventListener("change", () => {
+        const [field, order] = sortBy.value.split("-");
+        const tbody = documentsTable.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        rows.sort((a, b) => {
+          let aValue, bValue;
+          if (field === "createdAt") {
+            aValue = new Date(a.cells[3].textContent);
+            bValue = new Date(b.cells[3].textContent);
+          } else if (field === "fileType") {
+            aValue = a.cells[1].textContent.toLowerCase();
+            bValue = b.cells[1].textContent.toLowerCase();
+          } else if (field === "originalFilename") {
+            aValue = a.cells[0].textContent.toLowerCase();
+            bValue = b.cells[0].textContent.toLowerCase();
+          }
+          if (order === "asc") {
+            return aValue > bValue ? 1 : -1;
+          } else {
+            return aValue < bValue ? 1 : -1;
+          }
+        });
+        tbody.innerHTML = "";
+        rows.forEach((row) => tbody.appendChild(row));
+      });
+
+      // Download with loading state and error handling
+      async function downloadDocument(button) {
+        const publicId = button.dataset.publicId;
+        const filename = button.dataset.filename;
+        const errorMessage = document.getElementById("error-message");
+        button.disabled = true;
+        button.innerHTML =
+          '<i class="fas fa-spinner fa-spin mr-2"></i> Downloading...';
+        errorMessage.style.display = "none";
+
+        try {
+          const response = await fetch(
+            `/users/download/${publicId}?token=<%= token %>`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/octet-stream",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Download failed: ${response.statusText}`);
+          }
+
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error("Download error:", err);
+          errorMessage.textContent = `Failed to download ${filename}: ${err.message}`;
+          errorMessage.style.display = "block";
+        } finally {
+          button.disabled = false;
+          button.innerHTML = '<i class="fas fa-download mr-2"></i> Download';
+        }
+      }
     </script>
   </body>
 </html>
