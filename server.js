@@ -390,10 +390,16 @@ app.get(
 );
 
 app.get('/admin', authMiddleware('admin'), async (req, res) => {
-  const users = await User.find({ role: 'user' });
-  console.log('Users fetched for admin:', users.length);
-  const token = req.query.token || '';
-  res.render('admin/admin', { users, error: null, token });
+  try {
+    const users = await User.find({ role: 'user' });
+    const admin = await User.findById(req.user.id).select('name email');
+    console.log('Users fetched for admin:', users.length);
+    const token = req.query.token || '';
+    res.render('admin', { users, admin, error: null, token });
+  } catch (err) {
+    console.error('Error fetching admin data:', err);
+    res.render('admin', { users: [], admin: null, error: err.message, token: req.query.token || '' });
+  }
 });
 
 
