@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Portal - College Structure</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary-blue: #3b82f6;
+      --primary-purple: #8b5cf6;
+      --primary-teal: #06b6d4;
+      --primary-pink: #ec4899;
+      --primary-indigo: #6366f1;
+      --accent-orange: #f97316;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem 1rem;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: var(--primary-blue);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar-toggle {
+        display: block;
+      }
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a i {
+      margin-right: 0.75rem;
+    }
+
+    .morphing-container {
+      margin-left: 250px;
+      padding: 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      .morphing-container {
+        margin-left: 0;
+      }
+    }
+
+    .blob-card {
+      background: rgba(22, 21, 21, 0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blob-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
+    }
+
+    .college-blob {
+      border-radius: 60px 25px 60px 25px;
+      transform: rotate(-2deg);
+      margin: 2rem 1rem;
+    }
+
+    .text-flow {
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .fade-in-flow {
+      animation: fadeInLeft 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    @keyframes fadeInLeft {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      background: rgba(0, 0, 255, 0.0);
+      backdrop-filter: blur(15px);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: transparent;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .icon-bubble {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .student-link {
+      cursor: pointer;
+      color: var(--primary-blue);
+      transition: color 0.3s ease;
+    }
+
+    .student-link:hover {
+      color: var(--primary-purple);
+    }
+  </style>
+</head>
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-angle-double-right"></i>
+  </button>
+  <%- include('../partials/admin-sidebar', { token, currentPage: 'college' }) %>
+
+  <div class="morphing-container">
+    <header class="flowing-grid">
+      <div class="px-8 py-6">
+        <div class="flex items-center">
+          <div class="icon-bubble mr-6">
+            <i class="fas fa-university"></i>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-flow">College Structure</h1>
+            <p class="text-flow opacity-70">Overview of courses, branches</p>
+          </div>
+        </div>
+      </div>
+    <main class="container">
+      <section class="overview-section">
+        <div class="blob-card college-blob slide-in-left">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-4">College Summary</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-flow">
+                <p><strong>Total Courses:</strong> <%= courses.length %></p>
+                <p><strong>Total Branches:</strong> <%= branches.length %></p>
+                <p><strong>Total Students:</strong> <%= students.length %></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="courses-section">
+        <div class="blob-card college-blob slide-in-left">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-4">Courses</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Students Enrolled</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% courses.forEach(course => { %>
+                    <tr>
+                      <td><%= course.name %></td>
+                      <td><%= course.studentCount %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="branches-section">
+        <div class="blob-card college-blob slide-in-left">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-4">Branches</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Course</th>
+                    <th>Branch</th>
+                    <th>Students Enrolled</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% branches.forEach(branch => { %>
+                    <tr>
+                      <td><%= branch.course %></td>
+                      <td><%= branch.name %></td>
+                      <td><%= branch.studentCount %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="students-section">
+        <div class="blob-card college-blob slide-in-left">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-4">Students</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Roll Number</th>
+                    <th>Course</th>
+                    <th>Branch</th>
+                    <th>Semester</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% students.forEach(student => { %>
+                    <tr>
+                      <td><span class="student-link" data-user-id="<%= student._id %>"><%= student.name %></span></td>
+                      <td><%= student.details.rollNo %></td>
+                      <td><%= student.course %></td>
+                      <td><%= student.branch %></td>
+                      <td><%= student.semester %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="user-details" class="hidden blob-card college-blob slide-in-left">
+        <div class="p-8">
+          <h3 class="text-2xl font-bold text-flow mb-4">Student Details</h3>
+          <div class="table-container">
+            <table>
+              <tbody id="user-details-content">
+              </tbody>
+            </table>
+          </div>
+          <button class="flowing-button mt-4" onclick="closeUserDetails()">Close</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.sidebar-toggle');
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    const studentLinks = document.querySelectorAll('.student-link');
+    const userDetails = document.getElementById('user-details');
+    const userDetailsContent = document.getElementById('user-details-content');
+
+    studentLinks.forEach(link => {
+      link.addEventListener('click', async () => {
+        const userId = link.dataset.userId;
+        const response = await fetch(`/api/users/${userId}?token=${encodeURIComponent('<%= token %>')}`);
+        if (response.ok) {
+          const user = await response.json();
+          userDetailsContent.innerHTML = `
+            <tr><td>Name</td><td>${user.name}</td></tr>
+            <tr><td>Roll Number}</td><td>${user.details.rollNo}</td></tr>
+            <tr><Course>Roll Number</td><td>${user.course}</td></tr>
+            <tr><td>Branch</td><td>${user.branch}</td></tr>
+            <tr><td>Semester</td><td>${user.semester}</td></tr>
+            <tr><td>Phone</td><td>${user.details.phone}</td></tr>
+            <tr><td>Address</td><td>${user.details.address}</td></tr>
+            <tr><td>Date of Birth</td><td>${user.details.dob}</td></tr>
+            <tr><td>Father's Name</td><td>${user.details.fatherName}</td></tr>
+            <tr><td>Mother's Name</td><td>${user.details.motherName}</td></tr>
+          `;
+          userDetails.classList.remove('hidden');
+        }
+      });
+    });
+
+    function closeUserDetails() {
+      userDetails.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

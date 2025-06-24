@@ -1,0 +1,28 @@
+<div class="sidebar">
+  <div class="sidebar-nav">
+    <a href="/admin?token=<%= token %>" class="<%= currentPage === 'admin' ? 'active' : '' %>">
+      <i class="fas fa-cogs"></i> Dashboard
+    </a>
+    <a href="/admin/college?token=<%= token %>" class="<%= currentPage === 'college' ? 'active' : '' %>">
+      <i class="fas fa-university"></i> College Structure
+    </a>
+    <a href="/admin/create-user?token=<%= token %>" class="<%= currentPage === 'create-user' ? 'active' : '' %>">
+      <i class="fas fa-user-plus"></i> Create User
+    </a>
+    <a href="/admin/make-attendance?token=<%= token %>" class="<%= currentPage === 'make-attendance' ? 'active' : '' %>">
+      <i class="fas fa-calendar-check"></i> Make Attendance
+    </a>
+    <a href="/admin/edit-user?token=<%= token %>" class="<%= currentPage === 'edit-user' ? 'active' : '' %>">
+      <i class="fas fa-user-edit"></i> Edit User
+    </a>
+    <a href="/admin/upload-documents?token=<%= token %>" class="<%= currentPage === 'upload-documents' ? 'active' : '' %>">
+      <i class="fas fa-file-upload"></i> Upload Documents
+    </a>
+    <a href="/admin/assign-teachers?token=<%= token %>" class="<%= currentPage === 'assign-teachers' ? 'active' : '' %>">
+      <i class="fas fa-chalkboard-teacher"></i> Assign Teachers
+    </a>
+    <a href="/logout?token=<%= token %>">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
+</div>

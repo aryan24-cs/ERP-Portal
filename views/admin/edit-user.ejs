@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Portal - Edit User</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <style>
+    :root {
+      --primary-blue: #3b82f6;
+      --primary-purple: #8b5cf6;
+      --primary-teal: #06b6d4;
+      --primary-pink: #ec4899;
+      --primary-indigo: #6366f1;
+      --accent-orange: #f97316;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 2rem 1rem;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: var(--primary-blue);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar-toggle {
+        display: block;
+      }
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-nav a:hover, .sidebar-nav a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .sidebar-nav a i {
+      margin-right: 0.75rem;
+    }
+
+    .morphing-container {
+      margin-left: 250px;
+      padding: 2rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      .morphing-container {
+        margin-left: 0;
+      }
+    }
+
+    .blob-card {
+      background: rgba(22, 21, 21, 0.15);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .blob-card:hover {
+      transform: translateY(-15px) scale(1.02);
+      box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
+    }
+
+    .edit-user-blob {
+      border-radius: 60px 25px 60px 25px;
+      transform: rotate(-2deg);
+      margin: 2rem 1rem;
+    }
+
+    .text-flow {
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .fade-in-flow {
+      animation: fadeInFlow 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    @keyframes fadeInFlow {
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .input-flow {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 0.75rem;
+      color: white;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .input-flow:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+
+    .flowing-button {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple), var(--primary-teal));
+      background-size: 200% 200%;
+      border: none;
+      border-radius: 50%;
+      padding: 0.75rem 1.5rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      animation: gradientFlow 3s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .flowing-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    .error-flow {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+  <%- include('../partials/admin-sidebar', { token, currentPage: 'edit-user' }) %>
+
+  <div class="morphing-container">
+    <header class="organic-header fade-in-flow">
+      <div class="px-8 py-6">
+        <div class="flex items-center">
+          <div class="icon-bubble mr-6">
+            <i class="fas fa-user-edit"></i>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-flow">Edit User</h1>
+            <p class="text-flow opacity-90 text-lg">Select a user to edit their details</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flowing-grid">
+      <section class="edit-user-section">
+        <div class="blob-card edit-user-blob slide-in-left">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-6">Select User</h3>
+            <div class="mb-4">
+              <label for="userSelect" class="block text-flow font-semibold mb-1">Student</label>
+              <select id="userSelect" class="input-flow" onchange="loadUserDetails()">
+                <option value="">Select Student</option>
+                <% users.forEach(user => { %>
+                  <option value="<%= user._id %>"><%= user.name %> (<%= user.details.rollNo %>)</option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="edit-form-container" class="blob-card edit-user-blob slide-in-left hidden">
+          <div class="p-8">
+            <h3 class="text-2xl font-bold text-flow mb-6">Edit Student Details</h3>
+            <% if (error) { %>
+              <div class="error-flow fade-in-flow" id="error-message">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+                  <span class="font-semibold text-lg"><%= error %></span>
+                </div>
+                <button class="text-white hover:text-gray-200" onclick="dismissMessage()" aria-label="Close error message">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            <% } %>
+            <form id="edit-user-form" action="/admin/edit-user?token=<%= token %>" method="POST">
+              <input type="hidden" id="userId" name="userId" />
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label for="name" class="block text-flow font-semibold mb-1">Name</label>
+                  <input type="text" id="name" name="name" class="input-flow" required />
+                </div>
+                <div>
+                  <label for="email" class="block text-flow font-semibold mb-1">Email</label>
+                  <input type="email" id="email" name="email" class="input-flow" required />
+                </div>
+                <div>
+                  <label for="rollNo" class="block text-flow font-semibold mb-1">Roll Number</label>
+                  <input type="text" id="rollNo" name="rollNo" class="input-flow" required />
+                </div>
+                <div>
+                  <label for="course" class="block text-flow font-semibold mb-1">Course</label>
+                  <select id="course" name="course" class="input-flow" required>
+                    <option value="">Select Course</option>
+                    <option value="B.Tech">B.Tech</option>
+                    <option value="BCA">BCA</option>
+                    <option value="BBA">BBA</option>
+                    <option value="MBA">MBA</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="branch" class="block text-flow font-semibold mb-1">Branch</label>
+                  <select id="branch" name="branch" class="input-flow" required>
+                    <option value="">Select Branch</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="semester" class="block text-flow font-semibold mb-1">Semester</label>
+                  <select id="semester" name="semester" class="input-flow" required>
+                    <option value="">Select Semester</option>
+                    <% for (let i = 1; i <= 8; i++) { %>
+                      <option value="<%= i %>"><%= i %></option>
+                    <% } %>
+                  </select>
+                </div>
+                <div>
+                  <label for="phone" class="block text-flow font-semibold mb-1">Phone</label>
+                  <input type="text" id="phone" name="phone" class="input-flow" required pattern="\d{10,15}" />
+                </div>
+                <div>
+                  <label for="dob" class="block text-flow font-semibold mb-1">Date of Birth</label>
+                  <input type="text" id="dob" name="dob" class="input-flow flatpickr" required />
+                </div>
+                <div>
+                  <label for="fatherName" class="block text-flow font-semibold mb-1">Father's Name</label>
+                  <input type="text" id="fatherName" name="fatherName" class="input-flow" required />
+                </div>
+                <div>
+                  <label for="motherName" class="block text-flow font-semibold mb-1">Mother's Name</label>
+                  <input type="text" id="motherName" name="motherName" class="input-flow" required />
+                </div>
+              </div>
+              <div class="mb-4">
+                <label for="address" class="block text-flow font-semibold mb-1">Address</label>
+                <textarea id="address" name="address" class="input-flow" rows="4" required></textarea>
+              </div>
+              <input type="hidden" name="token" value="<%= token %>" />
+              <button type="submit" class="flowing-button">
+                <i class="fas fa-save mr-2"></i> Save Changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    const toggle = document.querySelector('.sidebar-toggle');
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    flatpickr('.flatpickr', {
+      dateFormat: 'Y-m-d',
+      maxDate: new Date()
+    });
+
+    const courseData = {
+      'B.Tech': ['CSE', 'ECE', 'CE', 'ME', 'Chemical'],
+      'BCA': ['General', 'Data Science'],
+      'BBA': ['General', 'Marketing'],
+      'MBA': ['Finance', 'HR']
+    };
+
+    const courseSelect = document.getElementById('course');
+    const branchSelect = document.getElementById('branch');
+
+    courseSelect.addEventListener('change', () => {
+      const branches = courseData[courseSelect.value] || [];
+      branchSelect.innerHTML = '<option value="">Select Branch</option>';
+      branches.forEach(branch => {
+        branchSelect.innerHTML += `<option value="${branch}">${branch}</option>`;
+      });
+    });
+
+    async function loadUserDetails() {
+      const userId = document.getElementById('userSelect').value;
+      if (userId) {
+        const response = await fetch(`/api/users/${userId}?token=${encodeURIComponent('<%= token %>')}`);
+        if (response.ok) {
+          const user = await response.json();
+          document.getElementById('edit-form-container').classList.remove('hidden');
+          document.getElementById('userId').value = user._id;
+          document.getElementById('name').value = user.name;
+          document.getElementById('email').value = user.email;
+          document.getElementById('rollNo').value = user.details.rollNo;
+          document.getElementById('course').value = user.course;
+          courseSelect.dispatchEvent(new Event('change'));
+          document.getElementById('branch').value = user.branch;
+          document.getElementById('semester').value = user.semester;
+          document.getElementById('phone').value = user.details.phone;
+          document.getElementById('dob').value = user.details.dob;
+          document.getElementById('fatherName').value = user.details.fatherName;
+          document.getElementById('motherName').value = user.details.motherName;
+          document.getElementById('address').value = user.details.address;
+        }
+      }
+    }
+
+    function dismissMessage() {
+      const message = document.getElementById('error-message');
+      if (message) {
+        message.style.transition = 'opacity 0.5s ease';
+        message.style.opacity = '0';
+        setTimeout(() => message.remove(), 500);
+      }
+    }
+    if (document.getElementById('error-message')) {
+      setTimeout(dismissMessage, 5000);
+    }
+  </script>
+</body>
+</html>

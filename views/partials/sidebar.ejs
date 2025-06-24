@@ -1,0 +1,13 @@
+<nav class="sidebar">
+  <div class="px-4 py-6">
+    <h2 class="text-2xl font-bold text-flow mb-6">ERP Portal</h2>
+    <div class="sidebar-nav">
+      <a href="/users/user?token=<%= token %>" <%= currentPage === 'user' ? 'class="active"' : '' %>><i class="fas fa-home"></i> Overall</a>
+      <a href="/users/attendance?token=<%= token %>" <%= currentPage === 'attendance' ? 'class="active"' : '' %>><i class="fas fa-calendar-check"></i> Attendance</a>
+      <a href="/users/teachers?token=<%= token %>" <%= currentPage === 'teachers' ? 'class="active"' : '' %>><i class="fas fa-chalkboard-teacher"></i> Your Teachers</a>
+      <a href="/users/documents?token=<%= token %>" <%= currentPage === 'documents' ? 'class="active"' : '' %>><i class="fas fa-file-alt"></i> Your Documents</a>
+      <a href="/users/update-profile?token=<%= token %>" <%= currentPage === 'update-profile' ? 'class="active"' : '' %>><i class="fas fa-edit"></i> Update Profile</a>
+      <a href="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+</nav>

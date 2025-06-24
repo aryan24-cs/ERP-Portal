@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERP Portal - Your Documents</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-blue: #3b82f6;
+        --primary-purple: #8b5cf6;
+        --primary-teal: #06b6d4;
+        --primary-pink: #ec4899;
+        --primary-indigo: #6366f1;
+        --accent-orange: #f97316;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #164172 0%,
+          #3d5f75 100%
+        );/* Neutral background */
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 2rem 1rem;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.hidden {
+        transform: translateX(-100%);
+      }
+
+      .sidebar-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background: var(--primary-blue);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+        }
+        .sidebar-toggle {
+          display: block;
+        }
+      }
+
+      .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-nav a:hover,
+      .sidebar-nav a.active {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+      }
+
+      .sidebar-nav a i {
+        margin-right: 0.75rem;
+      }
+
+      .morphing-container {
+        margin-left: 250px;
+        padding: 2rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      @media (max-width: 768px) {
+        .morphing-container {
+          margin-left: 0;
+        }
+      }
+
+      .blob-card {
+        background: rgba(22, 21, 21, 0.15); /* Darker blob background */
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .blob-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
+      }
+
+      .documents-blob {
+        border-radius: 50px 30px 50px 30px;
+        transform: rotate(-1deg);
+        margin: 1.5rem 0.5rem;
+      }
+
+      .text-flow {
+        color: white;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .fade-in-flow {
+        animation: fadeInFlow 1s ease-out forwards;
+        opacity: 0;
+      }
+
+      .slide-in-left {
+        animation: slideInLeft 0.8s ease-out forwards;
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+
+      @keyframes fadeInFlow {
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes slideInLeft {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .document-item {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .document-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .flowing-button {
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--primary-purple),
+          var(--primary-teal)
+        );
+        background-size: 200% 200%;
+        border: none;
+        border-radius: 50px;
+        padding: 0.75rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        animation: gradientFlow 3s ease infinite;
+      }
+
+      @keyframes gradientFlow {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .flowing-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+      <i class="fas fa-bars"></i>
+    </button>
+    <%- include('../partials/sidebar', { token, currentPage: 'documents' }) %>
+
+    <div class="morphing-container">
+      <header class="organic-header fade-in-flow">
+        <div class="px-8 py-6">
+          <div class="flex items-center">
+            <div class="icon-bubble mr-6">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold text-flow">Your Documents</h1>
+              <p class="text-flow opacity-90 text-lg">All semester files</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="flowing-grid">
+        <section class="documents-section">
+          <div class="blob-card documents-blob slide-in-left">
+            <div class="p-8">
+              <h3 class="text-2xl font-bold text-flow mb-4">
+                Documents by Semester
+              </h3>
+              <div class="documents-flow">
+                <% const semesters = [...new Set(documents.map(doc =>
+                doc.semester))].sort(); semesters.forEach(semester => { %>
+                <h4 class="text-xl font-semibold text-flow mb-4">
+                  Semester <%= semester %>
+                </h4>
+                <% documents.filter(doc => doc.semester ===
+                semester).forEach((doc, index) => { %>
+                <div
+                  class="document-item text-flow"
+                >
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                      <i class="fas fa-file text-white text-xl mr-4"></i>
+                      <div>
+                        <p class="font-semibold"><%= doc.fileType %></p>
+                        <p class="opacity-70 text-sm">Manage your document</p>
+                      </div>
+                    </div>
+                    <div class="flex space-x-2">
+                      <a
+                        href="<%= doc.fileUrl %>"
+                        target="_blank"
+                        class="flowing-button"
+                      >
+                        <i class="fas fa-eye mr-2"></i> View
+                      </a>
+                      <a
+                        href="/users/download/<%= doc.publicId.split('/').pop() %>?token=<%= token %>"
+                        class="flowing-button"
+                      >
+                        <i class="fas fa-download mr-2"></i> Download
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <% }) %> <% }) %> <% if (semesters.length === 0) { %>
+                <p class="text-flow text-center opacity-70">
+                  No documents available
+                </p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      // Sidebar toggle
+      const sidebar = document.querySelector(".sidebar");
+      const toggle = document.querySelector(".sidebar-toggle");
+      toggle.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>
