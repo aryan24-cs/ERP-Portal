@@ -129,13 +129,14 @@ const transporter = nodemailer.createTransport({
 });
 
 // Send Email Function
-const sendEmail = async (to, subject, text) => {
+const sendEmail = async (to, subject, text, html) => {
   try {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to,
       subject,
       text,
+      html,
     });
     console.log(`Email sent to ${to}`);
   } catch (err) {
@@ -212,7 +213,56 @@ app.post("/forgot-password", async (req, res) => {
   await sendEmail(
     email,
     "Password Reset OTP",
-    `Your OTP is ${otp}. It is valid for 10 minutes.`
+    `Your OTP is ${otp}. It is valid for 10 minutes.`,
+    `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ERP Portal - Password Reset OTP</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #164172, #3d5f75); padding: 20px; text-align: center; color: white; border-radius: 10px 10px 0 0; }
+          .content { background: #f4f4f4; padding: 30px; border-radius: 0 0 10px 10px; color: #333; }
+          .otp { font-size: 24px; font-weight: 600; color: #3b82f6; text-align: center; margin: 20px 0; }
+          .button { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: 600; text-align: center; margin: 20px 0; }
+          .button:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+          .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+          @media (prefers-color-scheme: dark) {
+            .content { background: #1a1a1a; color: #e5e5e5; }
+            .footer { color: #a0a0a0; }
+          }
+          @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .button { width: 100%; box-sizing: border-box; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="font-size: 24px;">ERP Portal</h1>
+          </div>
+          <div class="content">
+            <h2 style="font-size: 20px; margin-bottom: 20px;">Password Reset Request</h2>
+            <p>Hello,</p>
+            <p>You requested to reset your ERP Portal password. Use the OTP below to proceed:</p>
+            <div class="otp">${otp}</div>
+            <p>This OTP is valid for <strong>10 minutes</strong>. If you didn't request this, please ignore this email.</p>
+            <a href="http://localhost:3000/login" class="button" aria-label="Go to login page">Go to Login</a>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} ERP Portal. All rights reserved.</p>
+            <p><a href="#" style="color: #3b82f6; text-decoration: none;">Contact Us</a> | <a href="#" style="color: #3b82f6; text-decoration: none;">Unsubscribe</a></p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
   );
 
   res.render("verify-otp", { email, error: null });
@@ -568,7 +618,60 @@ app.post("/admin/create-user", authMiddleware("admin"), async (req, res) => {
     await sendEmail(
       email,
       "Your ERP Portal Account",
-      `Your account has been created. Username: ${email}, Password: ${password}`
+      `Your account has been created. Username: ${email}, Password: ${password}`,
+      `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ERP Portal - Your Account Details</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #164172, #3d5f75); padding: 20px; text-align: center; color: white; border-radius: 10px 10px 0 0; }
+          .content { background: #f4f4f4; padding: 30px; border-radius: 0 0 10px 10px; color: #333; }
+          .credentials { margin: 20px 0; }
+          .credentials p { margin-bottom: 10px; }
+          .button { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: 600; text-align: center; margin: 20px 0; }
+          .button:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+          .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+          @media (prefers-color-scheme: dark) {
+            .content { background: #1a1a1a; color: #e5e5e5; }
+            .footer { color: #a0a0a0; }
+          }
+          @media (max-width: 600px) {
+            .container { padding: 10px; }
+            .button { width: 100%; box-sizing: border-box; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1 style="font-size: 24px;">ERP Portal</h1>
+          </div>
+          <div class="content">
+            <h2 style="font-size: 20px; margin-bottom: 20px;">Welcome to ERP Portal</h2>
+            <p>Hello ${name},</p>
+            <p>Your account has been created successfully. Below are your login credentials:</p>
+            <div class="credentials">
+              <p><strong>Username:</strong> ${email}</p>
+              <p><strong>Password:</strong> ${password}</p>
+            </div>
+            <p>Please log in and change your password for security. If you didn't request this account, contact us immediately.</p>
+            <a href="http://localhost:3000/login" class="button" aria-label="Go to login page">Go to Login</a>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} ERP Portal. All rights reserved.</p>
+            <p><a href="#" style="color: #3b82f6; text-decoration: none;">Contact Us</a> | <a href="#" style="color: #3b82f6; text-decoration: none;">Unsubscribe</a></p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
     );
 
     res.redirect(
@@ -813,7 +916,60 @@ app.post(
       await sendEmail(
         user.email,
         `New ${fileType} Uploaded`,
-        `Dear ${user.name},\nYour ${fileType} for semester ${semester} has been uploaded. Please check your dashboard.`
+        `Dear ${user.name},\nYour ${fileType} for semester ${semester} has been uploaded. Please check your dashboard.`,
+        `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>ERP Portal - New Document Uploaded</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Poppins', Arial, sans-serif; line-height: 1.6; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #164172, #3d5f75); padding: 20px; text-align: center; color: white; border-radius: 10px 10px 0 0; }
+            .content { background: #f4f4f4; padding: 30px; border-radius: 0 0 10px 10px; color: #333; }
+            .details { margin: 20px 0; }
+            .details p { margin-bottom: 10px; }
+            .button { display: inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 12px 24px; text-decoration: none; border-radius: 50px; font-weight: 600; text-align: center; margin: 20px 0; }
+            .button:hover { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+            .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+            @media (prefers-color-scheme: dark) {
+              .content { background: #1a1a1a; color: #e5e5e5; }
+              .footer { color: #a0a0a0; }
+            }
+            @media (max-width: 600px) {
+              .container { padding: 10px; }
+              .button { width: 100%; box-sizing: border-box; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1 style="font-size: 24px;">ERP Portal</h1>
+            </div>
+            <div class="content">
+              <h2 style="font-size: 20px; margin-bottom: 20px;">New Document Uploaded</h2>
+              <p>Dear ${user.name},</p>
+              <p>A new document has been uploaded to your ERP Portal account. Details are below:</p>
+              <div class="details">
+                <p><strong>Document Type:</strong> ${fileType}</p>
+                <p><strong>Semester:</strong> ${semester}</p>
+              </div>
+              <p>Please log in to your dashboard to view the document.</p>
+              <a href="http://localhost:3000/users/user?token=${token}" class="button" aria-label="View dashboard">View Dashboard</a>
+            </div>
+            <div class="footer">
+              <p>&copy; ${new Date().getFullYear()} ERP Portal. All rights reserved.</p>
+              <p><a href="#" style="color: #3b82f6; text-decoration: none;">Contact Us</a> | <a href="#" style="color: #3b82f6; text-decoration: none;">Unsubscribe</a></p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
       );
 
       fs.unlink(req.file.path, (err) => {
@@ -849,7 +1005,12 @@ app.get("/admin/college", authMiddleware("admin"), async (req, res) => {
     const teachers = await Teacher.find().select("name subject");
     const courses = await User.aggregate([
       { $match: { role: "user", course: { $ne: null } } },
-      { $group: { _id: "$course", studentCount: { $sum: 1 } } },
+      {
+        $group: {
+          _id: { course: "$course", branch: "$branch" },
+          studentCount: { $sum: 1 },
+        },
+      },
       { $project: { name: "$_id", studentCount: 1, _id: 0 } },
       { $sort: { name: 1 } },
     ]);
@@ -1095,7 +1256,9 @@ app.get("/api/students/:id/documents", authMiddleware(), async (req, res) => {
     res.json(documents);
   } catch (err) {
     console.error("Error fetching documents:", err);
-    res.status(500).json({ error: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch documents: " + err.message });
   }
 });
 

@@ -32,11 +32,7 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        );
+        background: linear-gradient(135deg, #164172 0%, #3d5f75 100%);
         min-height: 100vh;
         overflow-x: hidden;
       }
@@ -142,6 +138,23 @@
       .text-flow {
         color: white;
         text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .icon-bubble {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-blue),
+          var(--primary-purple)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
       }
 
       .fade-in-flow {
