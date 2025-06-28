@@ -58,7 +58,8 @@
       height: 100%;
       background: var(--card-bg);
       border-right: 1px solid #e5e7eb;
-      padding: 2rem 1rem;
+      padding: 1.5rem 1rem;
+      /* Reduced padding for mobile */
       z-index: 1000;
       transition: transform 0.3s ease;
     }
@@ -74,22 +75,36 @@
       z-index: 1001;
       background: var(--primary-blue);
       color: var(--card-bg);
-      padding: 0.5rem;
+      padding: 0.75rem;
+      /* Larger touch target */
       border-radius: 50%;
       cursor: pointer;
       display: none;
     }
 
+    .sidebar-close {
+      display: none;
+      background: var(--primary-blue);
+      color: var(--card-bg);
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
+        padding: 1rem 0.5rem;
+        /* Further reduced padding */
       }
 
       .sidebar.active {
         transform: translateX(0);
       }
 
-      .sidebar-toggle {
+      .sidebar-toggle,
+      .sidebar-close {
         display: block;
       }
     }
@@ -205,7 +220,7 @@
     .teacher-item {
       background: var(--card-bg);
       border: 1px solid #e5e7eb;
-      border-radius: 20px;
+      border-radius: 12px;
       padding: 1.5rem;
       margin-bottom: 1rem;
       transition: all 0.3s ease;
@@ -214,12 +229,109 @@
     }
 
     .teacher-item:hover {
-      transform: translateX(10px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      background: #f9fafb;
+      transform: translateX(5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .teacher-item {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .teacher-item:hover {
+        transform: none;
+        /* Disable translate on mobile */
+      }
+    }
+
+    .teacher-item:not(:last-child) {
+      border-bottom: 1px solid #e5e7eb;
     }
 
     .teacher-details p {
       margin-bottom: 0.5rem;
+    }
+
+    .teacher-details .teacher-name {
+      font-size: 1.125rem;
+      /* Larger for emphasis */
+      font-weight: 600;
+    }
+
+    .teacher-details .teacher-info {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .flowing-button {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+      background-size: 200% 200%;
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem 1.5rem;
+      color: var(--card-bg);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: gradientFlow 3s ease infinite;
+      min-width: 120px;
+      /* Larger touch target */
+      text-align: center;
+    }
+
+    .flowing-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .flowing-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    @keyframes gradientFlow {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .success-flow {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: var(--card-bg);
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      animation: fadeInFlow 0.5s ease-out;
+    }
+
+    .error-flow {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: var(--card-bg);
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      animation: fadeInFlow 0.5s ease-out;
     }
   </style>
 </head>
@@ -238,50 +350,84 @@
               <i class="fas fa-chalkboard-teacher"></i>
             </div>
             <div>
-              <h1 class="text-3xl font-bold text-flow">Your Teachers</h1>
-              <p class="text-flow opacity-90 text-lg">Meet your mentors</p>
+              <h1 class="text-4xl font-bold text-flow">Your Teachers</h1>
+              <p class="text-flow opacity-90 text-xl">Meet your mentors</p>
             </div>
           </div>
         </div>
       </header>
 
       <main class="flowing-grid">
-        <section class="teachers-section">
-          <div class="blob-card teachers-blob slide-in-left">
-            <div class="p-8">
-              <h3 class="text-2xl font-bold text-flow mb-4">Assigned Teachers</h3>
-              <div class="teachers-flow">
-                <% if (!user || !user.teachers || user.teachers.length===0) { %>
-                  <p class="text-flow text-center opacity-70">No teachers assigned</p>
-                  <% } else { %>
-                    <% user.teachers.forEach((teacher, index)=> { %>
-                      <div class="teacher-item text-flow">
-                        <div class="flex items-center">
-                          <i class="fas fa-chalkboard-teacher text-primary-blue text-xl mr-4"></i>
-                          <div class="teacher-details">
-                            <% if (teacher && teacher.teacherId && teacher.teacherId.name) { %>
-                              <p class="font-semibold text-lg">
-                                <%= teacher.teacherId.name %> (<%= teacher.subject || 'N/A' %>)
-                              </p>
-                              <p class="opacity-70 text-sm">
-                                Assigned on: <%= teacher.assignedAt ? new
-                                  Date(teacher.assignedAt).toLocaleDateString('en-US', { year: 'numeric' , month: 'long'
-                                  , day: 'numeric' }) : 'N/A' %>
-                              </p>
-                              <% } else { %>
-                                <p class="font-semibold text-lg text-red-600">
-                                  Teacher data unavailable
-                                </p>
-                                <% } %>
-                          </div>
-                        </div>
-                      </div>
-                      <% }) %>
-                        <% } %>
-              </div>
+        <% if (typeof success !=='undefined' && success) { %>
+          <div class="success-flow fade-in-flow" id="success-message">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-2xl mr-4"></i>
+              <span class="font-semibold text-lg">
+                <%= success %>
+              </span>
             </div>
+            <button class="text-white hover:text-gray-200" onclick="dismissMessage('success-message')"
+              aria-label="Close success message">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        </section>
+          <% } %>
+            <% if (typeof error !=='undefined' && error) { %>
+              <div class="error-flow fade-in-flow" id="error-message">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+                  <span class="font-semibold text-lg">
+                    <%= error %>
+                  </span>
+                </div>
+                <button class="text-white hover:text-gray-200" onclick="dismissMessage('error-message')"
+                  aria-label="Close error message">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <% } %>
+                <section class="teachers-section">
+                  <div class="blob-card teachers-blob slide-in-left">
+                    <div class="p-8">
+                      <h3 class="text-2xl font-bold text-flow mb-6">Assigned Teachers</h3>
+                      <div class="teachers-flow">
+                        <% if (!user || !user.teachers || user.teachers.length===0) { %>
+                          <p class="text-flow text-center opacity-70 text-lg">No teachers assigned</p>
+                          <% } else { %>
+                            <% user.teachers.forEach((teacher, index)=> { %>
+                              <article class="teacher-item text-flow">
+                                <div class="flex items-center justify-between flex-wrap gap-4">
+                                  <div class="flex items-center">
+                                    <i class="fas fa-chalkboard-teacher text-primary-blue text-xl mr-4"></i>
+                                    <div class="teacher-details">
+                                      <% if (teacher && teacher.teacherId && teacher.teacherId.name) { %>
+                                        <p class="teacher-name">
+                                          <%= teacher.teacherId.name %> (<%= teacher.subject || 'N/A' %>)
+                                        </p>
+                                        <p class="teacher-info">
+                                          Assigned on: <%= teacher.assignedAt ? new
+                                            Date(teacher.assignedAt).toLocaleDateString('en-US', { year: 'numeric' ,
+                                            month: 'long' , day: 'numeric' }) : 'N/A' %>
+                                        </p>
+                                        <% } else { %>
+                                          <p class="teacher-name text-red-600">Teacher data unavailable</p>
+                                          <% } %>
+                                    </div>
+                                  </div>
+                                  <% if (teacher && teacher.teacherId && teacher.teacherId.email) { %>
+                                    <a href="mailto:<%= teacher.teacherId.email %>" class="flowing-button"
+                                      aria-label="Contact <%= teacher.teacherId.name %>">
+                                      <i class="fas fa-envelope mr-2"></i> Contact
+                                    </a>
+                                    <% } %>
+                                </div>
+                              </article>
+                              <% }) %>
+                                <% } %>
+                      </div>
+                    </div>
+                  </div>
+                </section>
       </main>
     </div>
 
@@ -289,9 +435,36 @@
       // Sidebar toggle
       const sidebar = document.querySelector(".sidebar");
       const toggle = document.querySelector(".sidebar-toggle");
-      toggle.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
+      const closeBtn = document.querySelector(".sidebar-close");
+
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          sidebar.classList.add("active");
+        });
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+        });
+      }
+
+      // Auto-dismiss messages
+      function dismissMessage(id) {
+        const message = document.getElementById(id);
+        if (message) {
+          message.style.transition = "opacity 0.5s ease";
+          message.style.opacity = "0";
+          setTimeout(() => message.remove(), 500);
+        }
+      }
+
+      if (document.getElementById("success-message")) {
+        setTimeout(() => dismissMessage("success-message"), 5000);
+      }
+      if (document.getElementById("error-message")) {
+        setTimeout(() => dismissMessage("error-message"), 5000);
+      }
     </script>
 </body>
 
