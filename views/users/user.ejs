@@ -18,12 +18,16 @@
     />
     <style>
       :root {
-        --primary-blue: #3b82f6;
-        --primary-purple: #8b5cf6;
-        --primary-teal: #06b6d4;
+        --primary-blue: #1e90ff;
+        --primary-purple: #7c3aed;
+        --primary-teal: #14b8a6;
         --primary-pink: #ec4899;
-        --primary-indigo: #6366f1;
+        --primary-indigo: #4f46e5;
         --accent-orange: #f97316;
+        --bg-light: #f0f4f8;
+        --card-bg: #ffffff;
+        --text-dark: #1f2937;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       }
 
       * {
@@ -34,301 +38,150 @@
 
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        ); /* Neutral background */
+        background: var(--bg-light);
         min-height: 100vh;
         overflow-x: hidden;
+        color: var(--text-dark);
       }
 
-      .icon-bubble {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-      }
-
-      .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 2rem 1rem;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar.hidden {
-        transform: translateX(-100%);
-      }
-
-      .sidebar-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1001;
-        background: var(--primary-blue);
-        color: white;
-        padding: 0.5rem;
-        border-radius: 50%;
-        cursor: pointer;
-        display: none;
+      .main-content {
+        margin-left: 260px;
+        margin-top: 3rem;
+        padding: 2rem 1.5rem;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+        transition: margin-left 0.3s ease;
       }
 
       @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-        }
-        .sidebar-toggle {
-          display: block;
-        }
-      }
-
-      .sidebar-nav a {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-      }
-
-      .sidebar-nav a:hover,
-      .sidebar-nav a.active {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(5px);
-      }
-
-      .sidebar-nav a i {
-        margin-right: 0.75rem;
-      }
-
-      .morphing-container {
-        margin-left: 250px;
-        padding: 2rem;
-        position: relative;
-        z-index: 10;
-      }
-
-      @media (max-width: 768px) {
-        .morphing-container {
+        .main-content {
           margin-left: 0;
+          margin-top: 1.5rem;
+          padding: 1rem;
         }
       }
 
-      .blob-card {
-        background: rgba(22, 21, 21, 0.15); /* Darker blob background */
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .blob-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          45deg,
-          rgba(24, 23, 23, 0.5),
-          rgba(255, 255, 255, 0.45)
-        );
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .blob-card:hover::before {
-        opacity: 1;
-      }
-
-      .blob-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
-      }
-
-      .profile-blob {
-        border-radius: 60px 25px 60px 25px;
-        transform: rotate(-2deg);
-        margin: 2rem 1rem;
-      }
-
-      .documents-blob {
-        border-radius: 50px 30px 50px 30px;
-        transform: rotate(-1deg);
-        margin: 1.5rem 0.5rem;
-      }
-
-      .organic-header {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.2),
-          rgba(255, 255, 255, 0.1)
-        );
-        backdrop-filter: blur(30px);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        margin: 0 2rem;
+      .welcome-header,
+      .dashboard-grid,
+      .section-card {
         margin-bottom: 3rem;
-        position: relative;
-        overflow: hidden;
       }
 
-      .organic-header::after {
-        content: "";
-        position: absolute;
-        bottom: -50px;
-        left: 50%;
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(
-          45deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        border-radius: 50%;
-        transform: translateX(-50%);
-        opacity: 0.3;
-      }
-
-      .flowing-grid {
+      .dashboard-grid {
         display: grid;
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        max-width: 1400px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        max-width: 1200px;
         margin: 0 auto;
       }
 
-      .icon-bubble {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        position: relative;
-        animation: pulse 2s infinite;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
+      @media (max-width: 768px) {
+        .dashboard-grid {
+          grid-template-columns: repeat(1, 1fr);
         }
       }
 
-      .flowing-button {
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple),
-          var(--primary-teal)
-        );
-        background-size: 200% 200%;
-        border: none;
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.4s ease;
+      .dashboard-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow);
         position: relative;
         overflow: hidden;
-        animation: gradientFlow 3s ease infinite;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
-      @keyframes gradientFlow {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
+      .dashboard-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(30, 144, 255, 0.2) 0%, transparent 70%);
+        transition: transform 0.5s ease;
+        transform: scale(0);
+        z-index: 0;
       }
 
-      .flowing-button:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      .dashboard-card:hover::before {
+        transform: scale(1) rotate(45deg);
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-blue);
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease;
+      }
+
+      .dashboard-card:hover .card-icon {
+        transform: scale(1.2) rotate(5deg);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        position: relative;
+        z-index: 1;
+        margin-bottom: 0.5rem;
+      }
+
+      .card-description {
+        font-size: 0.9rem;
+        color: #6b7280;
+        position: relative;
+        z-index: 1;
+        margin-bottom: 1rem;
+      }
+
+      .welcome-header {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        text-align: center;
       }
 
       .success-flow {
         background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         padding: 1rem 2rem;
-        border-radius: 30px;
-        margin-bottom: 2rem;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        box-shadow: var(--shadow);
         animation: successPulse 2s ease infinite;
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
       }
 
       @keyframes successPulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.02);
-        }
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
       }
 
       .error-flow {
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
         padding: 1rem 2rem;
-        border-radius: 30px;
-        margin-bottom: 2rem;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
-      }
-
-      .text-flow {
-        color: white;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--shadow);
       }
 
       .fade-in-flow {
@@ -336,268 +189,271 @@
         opacity: 0;
       }
 
-      .slide-in-left {
-        animation: slideInLeft 0.8s ease-out forwards;
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-
       @keyframes fadeInFlow {
-        to {
-          opacity: 1;
-        }
+        to { opacity: 1; }
       }
 
-      @keyframes slideInLeft {
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
+      .section-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: var(--shadow);
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
-      .table-container {
-        overflow-x: auto;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(15px);
-        border-radius: 10px;
-        padding: 1rem;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: transparent;
-      }
-
-      th,
-      td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-      }
-
-      th {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .document-item {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        padding: 1rem;
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
         margin-bottom: 1rem;
-        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
       }
 
-      .document-item:hover {
-        transform: translateX(10px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      .section-title i {
+        margin-right: 0.75rem;
+        color: var(--primary-blue);
+      }
+
+      .attendance-progress {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .progress-bar {
+        flex: 1;
+        height: 10px;
+        background: #e5e7eb;
+        border-radius: 5px;
+        overflow: hidden;
+        position: relative;
+        min-width: 200px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--primary-blue);
+        transition: width 0.5s ease;
+      }
+
+      .document-item,
+      .assignment-item,
+      .library-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .document-item:last-child,
+      .assignment-item:last-child,
+      .library-item:last-child {
+        border-bottom: none;
+      }
+
+      .flowing-button {
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .flowing-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       }
     </style>
   </head>
   <body>
-    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
-      <i class="fas fa-bars"></i>
-    </button>
     <%- include('../partials/sidebar', { token, currentPage: 'user' }) %>
 
-    <div class="morphing-container">
-      <header class="organic-header fade-in-flow">
-        <div class="px-8 py-6">
+    <div class="main-content">
+      <header class="welcome-header fade-in-flow">
+        <h1 class="text-3xl font-bold">Welcome back, <%= user.name %>!</h1>
+        <p class="text-gray-600">Your academic hub for success</p>
+      </header>
+
+      <% if (success) { %>
+      <div class="success-flow fade-in-flow" id="success-message">
+        <div class="flex items-center">
+          <i class="fas fa-check-circle text-2xl mr-4"></i>
+          <span class="font-semibold text-lg"><%= success %></span>
+        </div>
+        <button
+          class="text-white hover:text-gray-200"
+          onclick="dismissMessage()"
+          aria-label="Close success message"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <% } %>
+      <% if (error) { %>
+      <div class="error-flow fade-in-flow" id="error-message">
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+          <span class="font-semibold text-lg"><%= error %></span>
+        </div>
+        <button
+          class="text-white hover:text-gray-200"
+          onclick="dismissMessage()"
+          aria-label="Close error message"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <% } %>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card fade-in-flow">
+          <i class="fas fa-user-circle card-icon"></i>
+          <h3 class="card-title">My Details</h3>
+          <p class="card-description">View and update your personal information</p>
+          <a href="/users/profile?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+        <div class="dashboard-card fade-in-flow" style="animation-delay: 0.1s">
+          <i class="fas fa-bullhorn card-icon"></i>
+          <h3 class="card-title">Announcements</h3>
+          <p class="card-description">Stay updated with important notices</p>
+          <a href="/users/announcements?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+        <div class="dashboard-card fade-in-flow" style="animation-delay: 0.2s">
+          <i class="fas fa-wallet card-icon"></i>
+          <h3 class="card-title">Fees</h3>
+          <p class="card-description">Manage tuition and payment details</p>
+          <a href="/users/fees?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+        <div class="dashboard-card fade-in-flow" style="animation-delay: 0.3s">
+          <i class="fas fa-chart-line card-icon"></i>
+          <h3 class="card-title">Academic Progress</h3>
+          <p class="card-description">Track grades and performance</p>
+          <a href="/users/academic-progress?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+        <div class="dashboard-card fade-in-flow" style="animation-delay: 0.4s">
+          <i class="fas fa-calendar-alt card-icon"></i>
+          <h3 class="card-title">Course Schedule</h3>
+          <p class="card-description">View your class timetable</p>
+          <a href="/users/schedule?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+        <div class="dashboard-card fade-in-flow" style="animation-delay: 0.5s">
+          <i class="fas fa-file-alt card-icon"></i>
+          <h3 class="card-title">Exam Results</h3>
+          <p class="card-description">Check your exam performance</p>
+          <a href="/users/results?token=<%= token %>" class="flowing-button">View Details</a>
+        </div>
+      </div>
+
+      <section class="section-card fade-in-flow">
+        <h2 class="section-title">
+          <i class="fas fa-calendar-check"></i> Overall Attendance
+        </h2>
+        <div class="attendance-progress">
+          <p class="font-semibold text-lg">
+            Attendance: 
+            <% const total = user && user.attendance ? user.attendance.length : 0; %>
+            <% const present = user && user.attendance ? user.attendance.filter(r => r.status === 'Present').length : 0; %>
+            <% const percentage = total > 0 ? Math.round((present / total) * 100) : 0; %>
+            <%= percentage %>%
+          </p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: <%= percentage %>%;"></div>
+          </div>
+        </div>
+        <a href="/users/attendance?token=<%= token %>" class="flowing-button mt-4 inline-block">
+          View Full Attendance
+        </a>
+      </section>
+
+      <section class="section-card fade-in-flow">
+        <h2 class="section-title">
+          <i class="fas fa-file-alt"></i> Recent Documents
+        </h2>
+        <% if (!documents || documents.length === 0) { %>
+        <p class="text-gray-600 text-center">No documents available for this semester</p>
+        <% } else { %>
+        <% documents.forEach((doc, index) => { %>
+        <div class="document-item">
           <div class="flex items-center">
-            <div class="icon-bubble mr-6">
-              <i class="fas fa-graduation-cap"></i>
-            </div>
+            <i class="fas fa-file text-primary-blue text-xl mr-4"></i>
             <div>
-              <h1 class="text-3xl font-bold text-flow">
-                Welcome back, <%= user.name %>!
-              </h1>
-              <p class="text-flow opacity-90 text-lg">
-                Your learning journey continues
+              <p class="font-semibold"><%= doc.fileType %> (Semester <%= doc.semester %>)</p>
+              <p class="text-gray-600 text-sm">Manage your document</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <a href="<%= doc.fileUrl %>" target="_blank" class="flowing-button">
+              <i class="fas fa-eye mr-2"></i> View
+            </a>
+            <a href="/users/download/<%= doc.publicId.split('/').pop() %>?token=<%= token %>" class="flowing-button">
+              <i class="fas fa-download mr-2"></i> Download
+            </a>
+          </div>
+        </div>
+        <% }) %>
+        <% } %>
+      </section>
+
+      <section class="section-card fade-in-flow">
+        <h2 class="section-title">
+          <i class="fas fa-tasks"></i> Upcoming Assignments
+        </h2>
+        <% if (typeof assignments === 'undefined' || !assignments || assignments.length === 0) { %>
+        <p class="text-gray-600 text-center">No assignments due</p>
+        <% } else { %>
+        <% assignments.forEach((assignment, index) => { %>
+        <div class="assignment-item">
+          <div class="flex items-center">
+            <i class="fas fa-book text-primary-blue text-xl mr-4"></i>
+            <div>
+              <p class="font-semibold"><%= assignment.title %> (<%= assignment.course %>)</p>
+              <p class="text-gray-600 text-sm">Due: <%= new Date(assignment.dueDate).toLocaleDateString() %></p>
+            </div>
+          </div>
+          <a href="/users/assignments/<%= assignment.id %>?token=<%= token %>" class="flowing-button">
+            View Details
+          </a>
+        </div>
+        <% }) %>
+        <% } %>
+      </section>
+
+      <section class="section-card fade-in-flow">
+        <h2 class="section-title">
+          <i class="fas fa-book-open"></i> Library Resources
+        </h2>
+        <% if (typeof libraryResources === 'undefined' || !libraryResources || libraryResources.length === 0) { %>
+        <p class="text-gray-600 text-center">No library resources reserved or borrowed</p>
+        <% } else { %>
+        <% libraryResources.forEach((resource, index) => { %>
+        <div class="library-item">
+          <div class="flex items-center">
+            <i class="fas fa-book text-primary-blue text-xl mr-4"></i>
+            <div>
+              <p class="font-semibold"><%= resource.title %></p>
+              <p class="text-gray-600 text-sm">
+                Status: <%= resource.status %> | Due: <%= resource.dueDate ? new Date(resource.dueDate).toLocaleDateString() : 'N/A' %>
               </p>
             </div>
           </div>
+          <a href="/users/library/<%= resource.id %>?token=<%= token %>" class="flowing-button">
+            Manage
+          </a>
         </div>
-      </header>
-
-      <main class="flowing-grid">
-        <% if (success) { %>
-        <div class="success-flow fade-in-flow" id="success-message">
-          <div class="flex items-center">
-            <i class="fas fa-check-circle text-2xl mr-4"></i>
-            <span class="font-semibold text-lg"><%= success %></span>
-          </div>
-          <button
-            class="text-white hover:text-gray-200"
-            onclick="dismissMessage()"
-            aria-label="Close success message"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <% } %> <% if (error) { %>
-        <div class="error-flow fade-in-flow" id="error-message">
-          <div class="flex items-center">
-            <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
-            <span class="font-semibold text-lg"><%= error %></span>
-          </div>
-          <button
-            class="text-white hover:text-gray-200"
-            onclick="dismissMessage()"
-            aria-label="Close error message"
-          >
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+        <% }) %>
         <% } %>
-
-        <section class="profile-section">
-          <div class="blob-card profile-blob slide-in-left">
-            <div class="p-8">
-              <div class="flex items-center mb-8">
-                <div class="icon-bubble mr-6">
-                  <i class="fas fa-user-circle"></i>
-                </div>
-                <div>
-                  <h2 class="text-3xl font-bold text-flow">Student Profile</h2>
-                  <p class="text-flow opacity-80 text-lg">
-                    Your academic identity
-                  </p>
-                </div>
-              </div>
-              <div class="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Field</th>
-                      <th>Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Name</td>
-                      <td><%= user.name %></td>
-                    </tr>
-                    <tr>
-                      <td>Roll Number</td>
-                      <td><%= user.details.rollNo %></td>
-                    </tr>
-                    <tr>
-                      <td>Class</td>
-                      <td>
-                        <%= user.course %>, <%= user.branch %>, Semester <%=
-                        user.semester %>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Phone</td>
-                      <td><%= user.details.phone %></td>
-                    </tr>
-                    <tr>
-                      <td>Date of Birth</td>
-                      <td><%= user.details.dob %></td>
-                    </tr>
-                    <tr>
-                      <td>Father's Name</td>
-                      <td><%= user.details.fatherName %></td>
-                    </tr>
-                    <tr>
-                      <td>Mother's Name</td>
-                      <td><%= user.details.motherName %></td>
-                    </tr>
-                    <tr>
-                      <td>Address</td>
-                      <td><%= user.details.address %></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="mt-6">
-                <p class="text-flow text-xl font-bold">
-                  Overall Attendance: <% const total = user.attendance.length;
-                  const present = user.attendance.filter(r => r.status ===
-                  'Present').length; const percentage = total > 0 ?
-                  Math.round((present / total) * 100) : 0; %> <%= percentage %>%
-                </p>
-                <a
-                  href="/users/attendance?token=<%= token %>"
-                  class="flowing-button mt-4 inline-block"
-                >
-                  <i class="fas fa-calendar-check mr-3"></i> View Full
-                  Attendance
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="documents-section">
-          <div class="blob-card documents-blob slide-in-left">
-            <div class="p-6">
-              <div class="flex items-center mb-6">
-                <div
-                  class="icon-bubble mr-4"
-                  style="width: 50px; height: 50px; font-size: 1.2rem"
-                >
-                  <i class="fas fa-file-alt"></i>
-                </div>
-                <div>
-                  <h3 class="text-2xl font-bold text-flow">Recent Documents</h3>
-                  <p class="text-flow opacity-70">Current semester files</p>
-                </div>
-              </div>
-              <div class="documents-flow">
-                <% if (documents.length === 0) { %>
-                <p class="text-flow text-center opacity-70">
-                  No documents available for this semester
-                </p>
-                <% } else { %> <% documents.forEach((doc, index) => { %>
-                <div class="document-item text-flow">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                      <i class="fas fa-file text-white text-xl mr-4"></i>
-                      <div>
-                        <p class="font-semibold">
-                          <%= doc.fileType %> (Semester <%= doc.semester %>)
-                        </p>
-                        <p class="opacity-70 text-sm">Manage your document</p>
-                      </div>
-                    </div>
-                    <div class="flex space-x-2">
-                      <a
-                        href="<%= doc.fileUrl %>"
-                        target="_blank"
-                        class="flowing-button"
-                      >
-                        <i class="fas fa-eye mr-2"></i> View
-                      </a>
-                      <a
-                        href="/users/download/<%= doc.publicId.split('/').pop() %>?token=<%= token %>"
-                        class="flowing-button"
-                      >
-                        <i class="fas fa-download mr-2"></i> Download
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                <% }) %> <% } %>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+      </section>
     </div>
 
     <script>
-      // Sidebar toggle
-      const sidebar = document.querySelector(".sidebar");
-      const toggle = document.querySelector(".sidebar-toggle");
-      toggle.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
-
       // Auto-dismiss messages
       function dismissMessage() {
         const message =

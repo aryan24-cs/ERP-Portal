@@ -1,10 +1,20 @@
-<nav class="sidebar">
-  <div class="px-4 py-6">
-    <h2 class="text-2xl font-bold text-flow mb-6">ERP Portal</h2>
-    <div class="sidebar-nav">
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo and Brand -->
+    <div class="navbar-brand">
+      <h2 class="brand-title">ERP Portal</h2>
+    </div>
+
+    <!-- Hamburger Menu for Mobile -->
+    <button class="navbar-toggle" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="navbar-menu">
       <a
         href="/users/user?token=<%= token %>"
-        class="<%= currentPage && currentPage.toLowerCase() === 'user' ? 'active' : '' %>"
+        class="navbar-link <%= currentPage && currentPage.toLowerCase() === 'user' ? 'active' : '' %>"
         data-page="user"
         aria-current="<%= currentPage && currentPage.toLowerCase() === 'user' ? 'page' : 'false' %>"
       >
@@ -12,7 +22,7 @@
       </a>
       <a
         href="/users/attendance?token=<%= token %>"
-        class="<%= currentPage && currentPage.toLowerCase() === 'attendance' ? 'active' : '' %>"
+        class="navbar-link <%= currentPage && currentPage.toLowerCase() === 'attendance' ? 'active' : '' %>"
         data-page="attendance"
         aria-current="<%= currentPage && currentPage.toLowerCase() === 'attendance' ? 'page' : 'false' %>"
       >
@@ -20,118 +30,164 @@
       </a>
       <a
         href="/users/teachers?token=<%= token %>"
-        class="<%= currentPage && currentPage.toLowerCase() === 'teachers' ? 'active' : '' %>"
+        class="navbar-link <%= currentPage && currentPage.toLowerCase() === 'teachers' ? 'active' : '' %>"
         data-page="teachers"
         aria-current="<%= currentPage && currentPage.toLowerCase() === 'teachers' ? 'page' : 'false' %>"
       >
-        <i class="fas fa-chalkboard-teacher"></i> Your Teachers
+        <i class="fas fa-chalkboard-teacher"></i> Teachers
       </a>
       <a
         href="/users/documents?token=<%= token %>"
-        class="<%= currentPage && currentPage.toLowerCase() === 'documents' ? 'active' : '' %>"
+        class="navbar-link <%= currentPage && currentPage.toLowerCase() === 'documents' ? 'active' : '' %>"
         data-page="documents"
         aria-current="<%= currentPage && currentPage.toLowerCase() === 'documents' ? 'page' : 'false' %>"
       >
-        <i class="fas fa-file-alt"></i> Your Documents
+        <i class="fas fa-file-alt"></i> Documents
       </a>
       <a
         href="/users/update-profile?token=<%= token %>"
-        class="<%= currentPage && currentPage.toLowerCase() === 'update-profile' ? 'active' : '' %>"
+        class="navbar-link <%= currentPage && currentPage.toLowerCase() === 'update-profile' ? 'active' : '' %>"
         data-page="update-profile"
         aria-current="<%= currentPage && currentPage.toLowerCase() === 'update-profile' ? 'page' : 'false' %>"
       >
-        <i class="fas fa-user-edit"></i> Update Profile
+        <i class="fas fa-user-edit"></i> Profile
       </a>
-      <a href="/" data-page="logout">
+      <a href="/" class="navbar-link" data-page="logout">
         <i class="fas fa-sign-out-alt"></i> Logout
       </a>
     </div>
   </div>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600&display=swap');
+
     :root {
-      --primary-blue: #3b82f6;
-      --primary-purple: #8b5cf6;
+      --primary-blue: #2563eb;
+      --primary-purple: #7c3aed;
+      --text-dark: #1f2937;
+      --light-gray: #f3f4f6;
     }
 
-    .text-flow {
-      color: white;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    .sidebar {
+    .navbar {
+      background: white;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       position: fixed;
       top: 0;
       left: 0;
-      width: 250px;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-right: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 2rem 1rem;
+      width: 100%;
       z-index: 1000;
-      transition: transform 0.3s ease;
+      padding: 0.75rem 1.5rem;
+      font-family: 'Inter', sans-serif;
     }
 
-    .sidebar.hidden {
-      transform: translateX(-100%);
+    .navbar-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .navbar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      color: var(--text-dark);
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .navbar-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-dark);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .navbar-link i {
+      margin-right: 0.4rem;
+      font-size: 1rem;
+    }
+
+    .navbar-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple));
+      transition: width 0.3s ease;
+    }
+
+    .navbar-link:hover::after,
+    .navbar-link.active::after {
+      width: 100%;
+    }
+
+    .navbar-link:hover,
+    .navbar-link.active {
+      color: var(--primary-blue);
     }
 
     @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
+      .navbar-toggle {
+        display: block;
       }
-      .sidebar.active {
-        transform: translateX(0);
+
+      .navbar-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
-    }
 
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-      transition: all 0.3s ease;
-      font-size: 1rem;
-      font-weight: 500;
-    }
+      .navbar-menu.active {
+        display: flex;
+      }
 
-    .sidebar-nav a:hover,
-    .sidebar-nav a.active {
-      background: linear-gradient(
-        135deg,
-        var(--primary-blue),
-        var(--primary-purple)
-      );
-      transform: translateX(5px);
-      color: white;
-      font-weight: 600;
-      box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
-    }
-
-    .sidebar-nav a.active {
-      border-left: 4px solid var(--primary-blue);
-    }
-
-    .sidebar-nav a i {
-      margin-right: 0.75rem;
-      font-size: 1.2rem;
+      .navbar-link {
+        width: 100%;
+        padding: 0.6rem 0;
+      }
     }
   </style>
 
-  <!-- <script>
-    // Ensure the correct sidebar link is highlighted on page load
+  <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Highlight active link
       const currentPath = window.location.pathname;
-      const sidebarLinks = document.querySelectorAll(".sidebar-nav a");
+      const navbarLinks = document.querySelectorAll(".navbar-link");
 
-      // Remove active class from all links
-      sidebarLinks.forEach((link) => link.classList.remove("active"));
-
-      // Map paths to page identifiers
       const pageMap = {
         "/users/user": "user",
         "/users/attendance": "attendance",
@@ -140,11 +196,11 @@
         "/users/update-profile": "update-profile",
       };
 
-      // Find and highlight the matching link
+      navbarLinks.forEach((link) => link.classList.remove("active"));
       const currentPage = pageMap[currentPath];
       if (currentPage) {
         const activeLink = document.querySelector(
-          `.sidebar-nav a[data-page="${currentPage}"]`
+          `.navbar-link[data-page="${currentPage}"]`
         );
         if (activeLink) {
           activeLink.classList.add("active");
@@ -152,14 +208,12 @@
         }
       }
 
-      // Handle sidebar toggle (consistent with update-profile.ejs)
-      const sidebar = document.querySelector(".sidebar");
-      const toggle = document.querySelector(".sidebar-toggle");
-      if (toggle) {
-        toggle.addEventListener("click", () => {
-          sidebar.classList.toggle("active");
-        });
-      }
+      // Toggle mobile menu
+      const toggleButton = document.querySelector(".navbar-toggle");
+      const navbarMenu = document.querySelector(".navbar-menu");
+      toggleButton.addEventListener("click", () => {
+        navbarMenu.classList.toggle("active");
+      });
     });
-  </script> -->
+  </script>
 </nav>

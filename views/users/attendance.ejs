@@ -1,290 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ERP Portal - Attendance</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      :root {
-        --primary-blue: #3b82f6;
-        --primary-purple: #8b5cf6;
-        --primary-teal: #06b6d4;
-        --primary-pink: #ec4899;
-        --primary-indigo: #6366f1;
-        --accent-orange: #f97316;
-      }
 
-      body {
-        font-family: "Poppins", sans-serif;
-        background: linear-gradient(
-          135deg,
-          #164172 0%,
-          #3d5f75 100%
-        ); /* Neutral background */
-        min-height: 100vh;
-        overflow-x: hidden;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Portal - Attendance</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-blue: #1e90ff;
+      --primary-purple: #7c3aed;
+      --primary-teal: #14b8a6;
+      --primary-pink: #ec4899;
+      --primary-indigo: #4f46e5;
+      --accent-orange: #f97316;
+      --bg-light: #f0f4f8;
+      --card-bg: #ffffff;
+      --text-dark: #1f2937;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
 
-      .icon-bubble {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple)
-        );
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.5rem;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: "Poppins", sans-serif;
+      background: var(--bg-light);
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text-dark);
+    }
+
+    .icon-bubble {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--card-bg);
+      font-size: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background: var(--card-bg);
+      border-right: 1px solid #e5e7eb;
+      padding: 1.5rem 1rem;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: var(--primary-blue);
+      color: var(--card-bg);
+      padding: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+
+    .sidebar-close {
+      display: none;
+      background: var(--primary-blue);
+      color: var(--card-bg);
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
       .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-right: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 2rem 1rem;
-        z-index: 1000;
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar.hidden {
         transform: translateX(-100%);
+        padding: 1rem 0.5rem;
       }
 
-      .sidebar-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1001;
-        background: var(--primary-blue);
-        color: white;
-        padding: 0.5rem;
-        border-radius: 50%;
-        cursor: pointer;
+      .sidebar.active {
+        transform: translateX(0);
+      }
+
+      .sidebar-toggle,
+      .sidebar-close {
+        display: block;
+      }
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      color: var(--text-dark);
+      text-decoration: none;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar-nav a.active {
+      background: var(--bg-light);
+    }
+
+    .sidebar-nav a i {
+      margin-right: 0.75rem;
+      color: var(--primary-blue);
+    }
+
+    .morphing-container {
+      margin-left: 260px;
+      margin-top: 3rem;
+      padding: 2rem 1.5rem;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: margin-left 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .morphing-container {
+        margin-left: 0;
+        margin-top: 1.5rem;
+        padding: 1rem;
+      }
+    }
+
+    .organic-header,
+    .attendance-section {
+      margin-bottom: 3rem;
+    }
+
+    .blob-card {
+      background: var(--card-bg);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .attendance-blob {
+      padding: 2.5rem;
+    }
+
+    .text-flow {
+      color: var(--text-dark);
+    }
+
+    .fade-in-flow {
+      animation: fadeInFlow 1s ease-out forwards;
+      opacity: 0;
+    }
+
+    .slide-in-left {
+      animation: slideInLeft 0.8s ease-out forwards;
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    @keyframes fadeInFlow {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideInLeft {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      background: var(--card-bg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: var(--bg-light);
+      z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      color: var(--text-dark);
+      font-size: 1rem;
+    }
+
+    th {
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    .subject-card {
+      display: none;
+      background: var(--card-bg);
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .subject-card:not(:last-child) {
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    @media (max-width: 768px) {
+      .table-container {
         display: none;
       }
 
-      @media (max-width: 768px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.active {
-          transform: translateX(0);
-        }
-        .sidebar-toggle {
-          display: block;
-        }
+      .subject-card {
+        display: block;
       }
+    }
 
-      .sidebar-nav a {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        color: white;
-        text-decoration: none;
-        border-radius: 10px;
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
-      }
+    .subject-link {
+      cursor: pointer;
+      color: var(--primary-blue);
+      font-weight: 600;
+    }
 
-      .sidebar-nav a:hover,
-      .sidebar-nav a.active {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(5px);
-      }
+    .subject-link:active {
+      color: var(--primary-teal);
+    }
 
-      .sidebar-nav a i {
-        margin-right: 0.75rem;
-      }
+    #attendance-calendar,
+    #subject-calendar {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 1rem;
+    }
 
-      .morphing-container {
-        margin-left: 250px;
-        padding: 2rem;
-        position: relative;
-        z-index: 10;
-      }
+    .fc-event-present {
+      background-color: #10b981;
+      border-color: #10b981;
+      color: var(--card-bg);
+    }
 
-      @media (max-width: 768px) {
-        .morphing-container {
-          margin-left: 0;
-        }
-      }
+    .fc-event-absent {
+      background-color: #ef4444;
+      border-color: #ef4444;
+      color: var(--card-bg);
+    }
 
-      .blob-card {
-        background: rgba(22, 21, 21, 0.15); /* Darker blob background */
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-      }
+    .flowing-button {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-teal));
+      background-size: 200% 200%;
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem 1.5rem;
+      color: var(--card-bg);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      animation: gradientFlow 3s ease infinite;
+      min-width: 120px;
+      text-align: center;
+      transition: background 0.3s ease;
+    }
 
-      .blob-card:hover {
-        transform: translateY(-15px) scale(1.02);
-        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.15);
-      }
+    .flowing-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-      .attendance-blob {
-        border-radius: 40px 80px 40px 80px;
-        transform: rotate(1deg);
-        margin: 1.5rem 0.5rem;
-      }
+    .flowing-button:active {
+      background: linear-gradient(135deg, var(--primary-teal), var(--primary-blue));
+    }
 
-      .text-flow {
-        color: white;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      }
-
-      .fade-in-flow {
-        animation: fadeInFlow 1s ease-out forwards;
-        opacity: 0;
-      }
-
-      .slide-in-left {
-        animation: slideInLeft 0.8s ease-out forwards;
-        opacity: 0;
-        transform: translateX(-50px);
-      }
-
-      @keyframes fadeInFlow {
-        to {
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideInLeft {
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      .table-container {
-        overflow-x: auto;
-        background: rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(15px);
-        border-radius: 10px;
-        padding: 1rem;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        background: transparent;
-      }
-
-      th,
-      td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
-      }
-
-      th {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .subject-link {
-        cursor: pointer;
-        color: var(--primary-blue);
-        transition: color 0.3s ease;
-      }
-
-      .subject-link:hover {
-        color: var(--primary-purple);
-      }
-
-      #attendance-calendar,
-      #subject-calendar {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-        padding: 1rem;
-      }
-
-      .fc-event-present {
-        background-color: #10b981;
-        border-color: #10b981;
-        color: white;
-      }
-
-      .fc-event-absent {
-        background-color: #ef4444;
-        border-color: #ef4444;
-        color: white;
-      }
-
+    @media (max-width: 768px) {
       .flowing-button {
-        background: linear-gradient(
-          135deg,
-          var(--primary-blue),
-          var(--primary-purple),
-          var(--primary-teal)
-        );
-        background-size: 200% 200%;
-        border: none;
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-        color: white;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-        animation: gradientFlow 3s ease infinite;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    @keyframes gradientFlow {
+      0% {
+        background-position: 0% 50%;
       }
 
-      @keyframes gradientFlow {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
+      50% {
+        background-position: 100% 50%;
       }
 
-      .flowing-button:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+      100% {
+        background-position: 0% 50%;
       }
-    </style>
-  </head>
-  <body>
-    <button class="sidebar-toggle" aria-label="Toggle Sidebar">
-      <i class="fas fa-bars"></i>
-    </button>
-    <%- include('../partials/sidebar', { token, currentPage: 'attendance' }) %>
+    }
+
+    .success-flow {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: var(--card-bg);
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      animation: fadeInFlow 0.5s ease-out;
+    }
+
+    .error-flow {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: var(--card-bg);
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      animation: fadeInFlow 0.5s ease-out;
+    }
+  </style>
+</head>
+
+<body>
+  <button class="sidebar-toggle" aria-label="Toggle Sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+  <%- include('../partials/sidebar', { token: token || '' , currentPage: 'attendance' }) %>
 
     <div class="morphing-container">
       <header class="organic-header fade-in-flow">
@@ -294,80 +367,138 @@
               <i class="fas fa-calendar-check"></i>
             </div>
             <div>
-              <h1 class="text-3xl font-bold text-flow">Attendance</h1>
-              <p class="text-flow opacity-90 text-lg">Track your presence</p>
+              <h1 class="text-4xl font-bold text-flow">Attendance</h1>
+              <p class="text-flow opacity-90 text-xl">Track your presence</p>
             </div>
           </div>
         </div>
       </header>
 
       <main class="flowing-grid">
-        <section class="attendance-section">
-          <div class="blob-card attendance-blob slide-in-left">
-            <div class="p-8">
-              <div id="overall-attendance-container">
-                <h3 class="text-2xl font-bold text-flow mb-4">
-                  Overall Attendance Calendar
-                </h3>
-                <div id="attendance-calendar"></div>
-              </div>
-              <h3 class="text-2xl font-bold text-flow mt-8 mb-4">
-                Subject-wise Attendance
-              </h3>
-              <div class="table-container">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Subject</th>
-                      <th>Present</th>
-                      <th>Absent</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <% if (attendanceBySubject.length === 0) { %>
-                    <tr>
-                      <td colspan="4" class="text-center text-flow opacity-70">
-                        No attendance records available
-                      </td>
-                    </tr>
-                    <% } else { %> <% attendanceBySubject.forEach(record => { %>
-                    <tr>
-                      <td>
-                        <span
-                          class="subject-link"
-                          data-subject="<%= record.subject %>"
-                          ><%= record.subject %></span
-                        >
-                      </td>
-                      <td><%= record.present %></td>
-                      <td><%= record.absent %></td>
-                      <td><%= record.total %></td>
-                    </tr>
-                    <% }) %> <% } %>
-                  </tbody>
-                </table>
-              </div>
-              <div id="subject-calendar-container" class="mt-8 hidden">
-                <div class="flex items-center justify-between mb-4">
-                  <h3
-                    class="text-2xl font-bold text-flow"
-                    id="subject-calendar-title"
-                  ></h3>
-                  <button
-                    id="back-to-overall"
-                    class="flowing-button"
-                    onclick="showOverallCalendar()"
-                  >
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Overall
-                    Attendance
-                  </button>
-                </div>
-                <div id="subject-calendar"></div>
-              </div>
+        <% if (typeof success !=='undefined' && success) { %>
+          <div class="success-flow fade-in-flow" id="success-message">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-2xl mr-4"></i>
+              <span class="font-semibold text-lg">
+                <%= success %>
+              </span>
             </div>
+            <button class="text-white hover:text-gray-200" onclick="dismissMessage('success-message')"
+              aria-label="Close success message">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        </section>
+          <% } %>
+            <% if (typeof error !=='undefined' && error) { %>
+              <div class="error-flow fade-in-flow" id="error-message">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+                  <span class="font-semibold text-lg">
+                    <%= error %>
+                  </span>
+                </div>
+                <button class="text-white hover:text-gray-200" onclick="dismissMessage('error-message')"
+                  aria-label="Close error message">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <% } %>
+                <section class="attendance-section">
+                  <div class="blob-card attendance-blob slide-in-left">
+                    <div class="p-8">
+                      <div id="overall-attendance-container">
+                        <h3 class="text-2xl font-bold text-flow mb-6">
+                          Overall Attendance Calendar
+                        </h3>
+                        <div id="attendance-calendar"></div>
+                      </div>
+                      <h3 class="text-2xl font-bold text-flow mt-8 mb-6">
+                        Subject-wise Attendance
+                      </h3>
+                      <div class="table-container">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th aria-label="Subject">Subject</th>
+                              <th aria-label="Present">Present</th>
+                              <th aria-label="Absent">Absent</th>
+                              <th aria-label="Total">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <% if (!attendanceBySubject || attendanceBySubject.length===0) { %>
+                              <tr>
+                                <td colspan="4" class="text-center text-flow opacity-70 text-lg">
+                                  No attendance records available
+                                </td>
+                              </tr>
+                              <% } else { %>
+                                <% attendanceBySubject.forEach(record=> { %>
+                                  <tr>
+                                    <td>
+                                      <span class="subject-link" data-subject="<%= record.subject || 'N/A' %>"
+                                        aria-label="View attendance for <%= record.subject || 'unknown subject' %>">
+                                        <%= record.subject || 'N/A' %>
+                                      </span>
+                                    </td>
+                                    <td>
+                                      <%= record.present || 0 %>
+                                    </td>
+                                    <td>
+                                      <%= record.absent || 0 %>
+                                    </td>
+                                    <td>
+                                      <%= record.total || 0 %>
+                                    </td>
+                                  </tr>
+                                  <% }) %>
+                                    <% } %>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="subject-cards">
+                        <% if (!attendanceBySubject || attendanceBySubject.length===0) { %>
+                          <p class="text-flow text-center opacity-70 text-lg">
+                            No attendance records available
+                          </p>
+                          <% } else { %>
+                            <% attendanceBySubject.forEach(record=> { %>
+                              <article class="subject-card">
+                                <div class="flex flex-col gap-2">
+                                  <p class="font-semibold text-lg">
+                                    <span class="subject-link" data-subject="<%= record.subject || 'N/A' %>"
+                                      aria-label="View attendance for <%= record.subject || 'unknown subject' %>">
+                                      <%= record.subject || 'N/A' %>
+                                    </span>
+                                  </p>
+                                  <p class="text-sm text-gray-600">
+                                    Present: <%= record.present || 0 %>
+                                  </p>
+                                  <p class="text-sm text-gray-600">
+                                    Absent: <%= record.absent || 0 %>
+                                  </p>
+                                  <p class="text-sm text-gray-600">
+                                    Total: <%= record.total || 0 %>
+                                  </p>
+                                </div>
+                              </article>
+                              <% }) %>
+                                <% } %>
+                      </div>
+                      <div id="subject-calendar-container" class="mt-8 hidden">
+                        <div class="flex items-center justify-between mb-6">
+                          <h3 class="text-2xl font-bold text-flow" id="subject-calendar-title"></h3>
+                          <button id="back-to-overall" class="flowing-button" onclick="showOverallCalendar()"
+                            aria-label="Back to overall attendance">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Overall
+                            Attendance
+                          </button>
+                        </div>
+                        <div id="subject-calendar"></div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
       </main>
     </div>
 
@@ -376,37 +507,66 @@
       // Sidebar toggle
       const sidebar = document.querySelector(".sidebar");
       const toggle = document.querySelector(".sidebar-toggle");
-      toggle.addEventListener("click", () => {
-        sidebar.classList.toggle("active");
-      });
+      const closeBtn = document.querySelector(".sidebar-close");
+
+      if (toggle) {
+        toggle.addEventListener("click", () => {
+          sidebar.classList.add("active");
+          console.log("Sidebar opened");
+        });
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          sidebar.classList.remove("active");
+          console.log("Sidebar closed");
+        });
+      }
+
+      // Auto-dismiss messages
+      function dismissMessage(id) {
+        const message = document.getElementById(id);
+        if (message) {
+          message.style.transition = "opacity 0.5s ease";
+          message.style.opacity = "0";
+          setTimeout(() => message.remove(), 500);
+        }
+      }
+
+      if (document.getElementById("success-message")) {
+        setTimeout(() => dismissMessage("success-message"), 5000);
+      }
+      if (document.getElementById("error-message")) {
+        setTimeout(() => dismissMessage("error-message"), 5000);
+      }
 
       // Attendance data
       const attendanceData = JSON.parse(
-        `<%- JSON.stringify(user.attendance).replace(/<\/script/g, '<\\/script') %>`
+        `<%= user && user.attendance ? JSON.stringify(user.attendance).replace(/<\/script/g, '<\\/script') : '[]' %>`
       );
 
       // Validate and format dates
       const validAttendanceData = attendanceData
         .filter((record) => {
+          if (!record || !record.date || !record.subject || !record.status) {
+            console.warn(`Invalid record: ${JSON.stringify(record)}`);
+            return false;
+          }
           const date = new Date(record.date);
           if (isNaN(date.getTime())) {
-            console.warn(
-              `Invalid date format for record: ${JSON.stringify(record)}`
-            );
+            console.warn(`Invalid date format for record: ${JSON.stringify(record)}`);
             return false;
           }
           return true;
         })
         .map((record) => ({
           ...record,
-          date: new Date(record.date).toISOString().split("T")[0], // Ensure YYYY-MM-DD
+          date: new Date(record.date).toISOString().split("T")[0],
         }));
 
       // Overall calendar
       const calendarEl = document.getElementById("attendance-calendar");
-      const overallContainer = document.getElementById(
-        "overall-attendance-container"
-      );
+      const overallContainer = document.getElementById("overall-attendance-container");
       let calendar = null;
 
       function renderOverallCalendar() {
@@ -419,31 +579,27 @@
             title: `${record.subject}: ${record.status}`,
             start: record.date,
             classNames:
-              record.status === "Present"
-                ? ["fc-event-present"]
-                : ["fc-event-absent"],
+              record.status === "Present" ? ["fc-event-present"] : ["fc-event-absent"],
           })),
           eventDidMount: function (info) {
-            info.el.setAttribute("title", info.event.title); // Tooltip
+            info.el.setAttribute("title", info.event.title);
+            info.el.setAttribute("aria-label", info.event.title);
           },
           eventsSet: function () {
             if (validAttendanceData.length === 0) {
               calendarEl.innerHTML =
-                '<p class="text-flow text-center opacity-70">No attendance records available</p>';
+                '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
             }
           },
         });
         calendar.render();
+        console.log("Rendered overall calendar");
       }
 
       // Subject-specific calendar
       const subjectLinks = document.querySelectorAll(".subject-link");
-      const subjectCalendarContainer = document.getElementById(
-        "subject-calendar-container"
-      );
-      const subjectCalendarTitle = document.getElementById(
-        "subject-calendar-title"
-      );
+      const subjectCalendarContainer = document.getElementById("subject-calendar-container");
+      const subjectCalendarTitle = document.getElementById("subject-calendar-title");
       let subjectCalendar = null;
 
       function showOverallCalendar() {
@@ -454,11 +610,16 @@
           subjectCalendar = null;
         }
         renderOverallCalendar();
+        console.log("Returned to overall calendar");
       }
 
       subjectLinks.forEach((link) => {
         link.addEventListener("click", () => {
           const subject = link.dataset.subject;
+          if (!subject || subject === "N/A") {
+            console.warn(`Invalid subject clicked: ${subject}`);
+            return;
+          }
           subjectCalendarTitle.textContent = `${subject} Attendance`;
           overallContainer.classList.add("hidden");
           subjectCalendarContainer.classList.remove("hidden");
@@ -482,19 +643,20 @@
               })),
             eventDidMount: function (info) {
               info.el.setAttribute("title", info.event.title);
+              info.el.setAttribute("aria-label", info.event.title);
             },
             eventsSet: function () {
               if (
-                validAttendanceData.filter(
-                  (record) => record.subject === subject
-                ).length === 0
+                validAttendanceData.filter((record) => record.subject === subject)
+                  .length === 0
               ) {
                 subjectCalendarEl.innerHTML =
-                  '<p class="text-flow text-center opacity-70">No attendance records for this subject</p>';
+                  '<p class="text-flow text-center opacity-70 text-lg">No attendance records for this subject</p>';
               }
             },
           });
           subjectCalendar.render();
+          console.log(`Rendered calendar for subject: ${subject}`);
         });
       });
 
@@ -503,8 +665,10 @@
         renderOverallCalendar();
       } else {
         calendarEl.innerHTML =
-          '<p class="text-flow text-center opacity-70">No attendance records available</p>';
+          '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
+        console.log("No valid attendance data to render");
       }
     </script>
-  </body>
+</body>
+
 </html>
