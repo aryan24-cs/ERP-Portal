@@ -260,11 +260,18 @@
       color: var(--primary-teal);
     }
 
+    .subject-link.disabled {
+      color: #9ca3af;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
     #attendance-calendar,
     #subject-calendar {
       background: var(--card-bg);
       border-radius: 10px;
       padding: 1rem;
+      min-height: 400px;
     }
 
     .fc-event-present {
@@ -436,7 +443,9 @@
                                 <% attendanceBySubject.forEach(record=> { %>
                                   <tr>
                                     <td>
-                                      <span class="subject-link" data-subject="<%= record.subject || 'N/A' %>"
+                                      <span
+                                        class="subject-link <%= !record.subject || record.subject === 'N/A' ? 'disabled' : '' %>"
+                                        data-subject="<%= record.subject || 'N/A' %>"
                                         aria-label="View attendance for <%= record.subject || 'unknown subject' %>">
                                         <%= record.subject || 'N/A' %>
                                       </span>
@@ -466,7 +475,9 @@
                               <article class="subject-card">
                                 <div class="flex flex-col gap-2">
                                   <p class="font-semibold text-lg">
-                                    <span class="subject-link" data-subject="<%= record.subject || 'N/A' %>"
+                                    <span
+                                      class="subject-link <%= !record.subject || record.subject === 'N/A' ? 'disabled' : '' %>"
+                                      data-subject="<%= record.subject || 'N/A' %>"
                                       aria-label="View attendance for <%= record.subject || 'unknown subject' %>">
                                       <%= record.subject || 'N/A' %>
                                     </span>
@@ -541,9 +552,26 @@
       }
 
       // Attendance data
-      const attendanceData = JSON.parse(
-        `<%= user && user.attendance ? JSON.stringify(user.attendance).replace(/<\/script/g, '<\\/script') : '[]' %>`
-      );
+      let attendanceData = [];
+      try {
+        attendanceData = JSON.parse(
+          `<%= user && user.attendance ? JSON.stringify(user.attendance).replace(/<\/script/g, '<\\/script') : '[]' %>`
+        );
+        console.log("Parsed attendance data:", attendanceData);
+      } catch (err) {
+        console.error("Error parsing attendance data:", err);
+        attendanceData = [];
+        document.getElementById("error-message").innerHTML = `
+          <div class="flex items-center">
+            <i class="fas fa-exclamation-circle text-2xl mr-4"></i>
+            <span class="font-semibold text-lg">Error loading attendance data</span>
+          </div>
+          <button class="text-white hover:text-gray-200" onclick="dismissMessage('error-message')" aria-label="Close error message">
+            <i class="fas fa-times"></i>
+          </button>`;
+        document.getElementById("error-message").className = "error-flow fade-in-flow";
+        document.getElementById("error-message").style.display = "flex";
+      }
 
       // Validate and format dates
       const validAttendanceData = attendanceData
@@ -570,30 +598,46 @@
       let calendar = null;
 
       function renderOverallCalendar() {
+        if (!calendarEl) {
+          console.error("Calendar element not found");
+          overallContainer.innerHTML =
+            '<p class="text-flow text-center opacity-70 text-lg">Error: Calendar container not found</p>';
+          return;
+        }
+
         if (calendar) {
           calendar.destroy();
+          console.log("Destroyed existing calendar");
         }
-        calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: "dayGridMonth",
-          events: validAttendanceData.map((record) => ({
-            title: `${record.subject}: ${record.status}`,
-            start: record.date,
-            classNames:
-              record.status === "Present" ? ["fc-event-present"] : ["fc-event-absent"],
-          })),
-          eventDidMount: function (info) {
-            info.el.setAttribute("title", info.event.title);
-            info.el.setAttribute("aria-label", info.event.title);
-          },
-          eventsSet: function () {
-            if (validAttendanceData.length === 0) {
-              calendarEl.innerHTML =
-                '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
-            }
-          },
-        });
-        calendar.render();
-        console.log("Rendered overall calendar");
+
+        try {
+          calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            height: "auto",
+            events: validAttendanceData.map((record) => ({
+              title: `${record.subject}: ${record.status}`,
+              start: record.date,
+              classNames:
+                record.status === "Present" ? ["fc-event-present"] : ["fc-event-absent"],
+            })),
+            eventDidMount: function (info) {
+              info.el.setAttribute("title", info.event.title);
+              info.el.setAttribute("aria-label", info.event.title);
+            },
+            eventsSet: function () {
+              if (validAttendanceData.length === 0) {
+                calendarEl.innerHTML =
+                  '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
+              }
+            },
+          });
+          calendar.render();
+          console.log("Rendered overall calendar with", validAttendanceData.length, "events");
+        } catch (err) {
+          console.error("Error rendering calendar:", err);
+          calendarEl.innerHTML =
+            '<p class="text-flow text-center opacity-70 text-lg">Error rendering calendar</p>';
+        }
       }
 
       // Subject-specific calendar
@@ -603,11 +647,14 @@
       let subjectCalendar = null;
 
       function showOverallCalendar() {
-        subjectCalendarContainer.classList.add("hidden");
-        overallContainer.classList.remove("hidden");
+        if (subjectCalendarContainer && overallContainer) {
+          subjectCalendarContainer.classList.add("hidden");
+          overallContainer.classList.remove("hidden");
+        }
         if (subjectCalendar) {
           subjectCalendar.destroy();
           subjectCalendar = null;
+          console.log("Destroyed subject calendar");
         }
         renderOverallCalendar();
         console.log("Returned to overall calendar");
@@ -620,53 +667,78 @@
             console.warn(`Invalid subject clicked: ${subject}`);
             return;
           }
-          subjectCalendarTitle.textContent = `${subject} Attendance`;
-          overallContainer.classList.add("hidden");
-          subjectCalendarContainer.classList.remove("hidden");
+          if (subjectCalendarTitle && subjectCalendarContainer && overallContainer) {
+            subjectCalendarTitle.textContent = `${subject} Attendance`;
+            overallContainer.classList.add("hidden");
+            subjectCalendarContainer.classList.remove("hidden");
+          } else {
+            console.error("Subject calendar elements not found");
+            return;
+          }
 
           if (subjectCalendar) {
             subjectCalendar.destroy();
           }
 
           const subjectCalendarEl = document.getElementById("subject-calendar");
-          subjectCalendar = new FullCalendar.Calendar(subjectCalendarEl, {
-            initialView: "dayGridMonth",
-            events: validAttendanceData
-              .filter((record) => record.subject === subject)
-              .map((record) => ({
-                title: record.status,
-                start: record.date,
-                classNames:
-                  record.status === "Present"
-                    ? ["fc-event-present"]
-                    : ["fc-event-absent"],
-              })),
-            eventDidMount: function (info) {
-              info.el.setAttribute("title", info.event.title);
-              info.el.setAttribute("aria-label", info.event.title);
-            },
-            eventsSet: function () {
-              if (
-                validAttendanceData.filter((record) => record.subject === subject)
-                  .length === 0
-              ) {
-                subjectCalendarEl.innerHTML =
-                  '<p class="text-flow text-center opacity-70 text-lg">No attendance records for this subject</p>';
-              }
-            },
-          });
-          subjectCalendar.render();
-          console.log(`Rendered calendar for subject: ${subject}`);
+          if (!subjectCalendarEl) {
+            console.error("Subject calendar element not found");
+            subjectCalendarContainer.innerHTML =
+              '<p class="text-flow text-center opacity-70 text-lg">Error: Calendar container not found</p>';
+            return;
+          }
+
+          try {
+            subjectCalendar = new FullCalendar.Calendar(subjectCalendarEl, {
+              initialView: "dayGridMonth",
+              height: "auto",
+              events: validAttendanceData
+                .filter((record) => record.subject === subject)
+                .map((record) => ({
+                  title: record.status,
+                  start: record.date,
+                  classNames:
+                    record.status === "Present"
+                      ? ["fc-event-present"]
+                      : ["fc-event-absent"],
+                })),
+              eventDidMount: function (info) {
+                info.el.setAttribute("title", info.event.title);
+                info.el.setAttribute("aria-label", info.event.title);
+              },
+              eventsSet: function () {
+                if (
+                  validAttendanceData.filter((record) => record.subject === subject)
+                    .length === 0
+                ) {
+                  subjectCalendarEl.innerHTML =
+                    '<p class="text-flow text-center opacity-70 text-lg">No attendance records for this subject</p>';
+                }
+              },
+            });
+            subjectCalendar.render();
+            console.log(`Rendered calendar for subject: ${subject}`);
+          } catch (err) {
+            console.error(`Error rendering subject calendar for ${subject}:`, err);
+            subjectCalendarEl.innerHTML =
+              '<p class="text-flow text-center opacity-70 text-lg">Error rendering calendar</p>';
+          }
         });
       });
 
       // Initial render
-      if (validAttendanceData.length > 0) {
-        renderOverallCalendar();
+      if (calendarEl) {
+        if (validAttendanceData.length > 0) {
+          renderOverallCalendar();
+        } else {
+          calendarEl.innerHTML =
+            '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
+          console.log("No valid attendance data to render");
+        }
       } else {
-        calendarEl.innerHTML =
-          '<p class="text-flow text-center opacity-70 text-lg">No attendance records available</p>';
-        console.log("No valid attendance data to render");
+        console.error("Calendar element not found on page load");
+        overallContainer.innerHTML =
+          '<p class="text-flow text-center opacity-70 text-lg">Error: Calendar container not found</p>';
       }
     </script>
 </body>
